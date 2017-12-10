@@ -36,7 +36,7 @@ Your new project will have a couple of files, but we will focus on just one of t
 
 The XAML code found in it (XAML is discussed in details in another chapter of this tutorial) should look something like this:
 
-```xaml
+```HTML
 <Window x:Class="WpfApplication1.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -55,7 +55,7 @@ This is the base XAML that Visual Studio creates for our window, all parts of it
 
 We'll do it by adding a TextBlock control to the Grid panel, with our aforementioned message as the content:
 
-```xaml
+```XML
 <Window x:Class="WpfApplication1.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -74,7 +74,7 @@ Try running the application now (select Debug -> Start debugging or press **F5**
 
 +++
 
-![Hello, WPF! - the result](/chapters/wpf-application/images/hello_wpf.png "Hello, WPF! - the result")
+![Hello, WPF! - the result](http://www.wpf-tutorial.com/chapters/wpf-application/images/hello_wpf.png "Hello, WPF! - the result")
 
 +++
 
