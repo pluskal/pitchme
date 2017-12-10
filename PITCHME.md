@@ -529,3 +529,153 @@ Notice how we use the FindResource() method on different scopes - first on the p
 +++
 
 The same is not true the other way around - the search doesn't navigate down the tree, so you can't start looking for a resource on the application level, if it has been defined locally for the control or for the window.
+
+---
+
+# Handling exceptions in WPF  
+
+If you're familiar with C# or any of the other .NET languages that you may use with WPF, then exception handling should not be new to you: Whenever you have a piece of code that are likely to throw an exception, then you should wrap it in a try-catch block to handle the exception gracefully. For instance, consider this example:
+
++++
+
+```C#
+private void Button_Click(object sender, RoutedEventArgs e)
+{
+        string s = null;
+        s.Trim();
+}
+```
+
++++
+
+Obviously it will go wrong, since I try to perform the Trim() method on a variable that's currently null. If you don't handle the exception, your application will crash and Windows will have to deal with the problem. As you can see, that isn't very user friendly:
+
++++
+
+![An unhandled exception, left for Windows to deal with](http://www.wpf-tutorial.com/chapters/wpf-application/images/exception_unhandled.png "An unhandled exception, left for Windows to deal with")
+
++++
+
+In this case, the user would be forced to close your application, due to such a simple and easily avoided error. So, if you know that things might go wrong, then you should use a try-catch block, like this:
+
++++
+
+```C#
+private void Button_Click(object sender, RoutedEventArgs e)
+{
+        string s = null;
+        try
+        {
+                s.Trim();
+        }
+        catch(Exception ex)
+        {
+                MessageBox.Show("A handled exception just occurred: " + ex.Message, "Exception Sample", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+}
+```
+
++++
+
+However, sometimes even the simplest code can throw an exception, and instead of wrapping every single line of code with a try- catch block, WPF lets you handle all unhandled exceptions globally. This is done through the **DispatcherUnhandledException** event on the Application class. If subscribed to, WPF will call the subscribing method once an exception is thrown which is not handled in your own code. Here's a complete example, based on the stuff we just went through:
+
++++
+
+```XML
+<Window x:Class="WpfTutorialSamples.WPF_Application.ExceptionHandlingSample"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ExceptionHandlingSample" Height="200" Width="200">
+    <Grid>
+        <Button HorizontalAlignment="Center" VerticalAlignment="Center" Click="Button_Click">
+            Do something bad!
+        </Button>
+    </Grid>
+</Window>
+```
+
++++
+
+```C#
+using System;
+using System.Windows;
+
+namespace WpfTutorialSamples.WPF_Application
+{
+        public partial class ExceptionHandlingSample : Window
+        {
+                public ExceptionHandlingSample()
+                {
+                        InitializeComponent();
+                }
+
+                private void Button_Click(object sender, RoutedEventArgs e)
+                {
+                        string s = null;
+                        try
+                        {
+                                s.Trim();
+                        }
+                        catch(Exception ex)
+                        {
+                                MessageBox.Show("A handled exception just occurred: " + ex.Message, "Exception Sample", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        }
+                        s.Trim();
+                }
+        }
+}
+```
+
++++
+
+Notice that I call the Trim() method an extra time, outside of the try-catch block, so that the first call is handled, while the second is not. For the second one, we need the App.xaml magic:
+
++++
+
+```XML
+<Application x:Class="WpfTutorialSamples.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             DispatcherUnhandledException="Application_DispatcherUnhandledException"
+             StartupUri="WPF Application/ExceptionHandlingSample.xaml">
+    <Application.Resources>
+    </Application.Resources>
+</Application>
+```
+
++++
+
+```C#
+using System;
+using System.Windows;
+
+namespace WpfTutorialSamples
+{
+        public partial class App : Application
+        {
+                private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+                {
+                        MessageBox.Show("An unhandled exception just occurred: " + e.Exception.Message, "Exception Sample", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        e.Handled = true;
+                }
+        }
+}
+```
+
++++
+
+![A locally handled exception](http://www.wpf-tutorial.com/chapters/wpf-application/images/exception_handled_locally.png "A locally handled exception")
+
++++
+
+![A globally handled exception](http://www.wpf-tutorial.com/chapters/wpf-application/images/exception_handled_globally.png "A globally handled exception")
+
++++
+
+We handle the exception much like the local one, but with a slightly different text and image in the message box. Also, notice that I set the e.Handled property to true. This tells WPF that we're done dealing with this exception and nothing else should be done about it.
+
+---
+
+## Summary
+
+Exception handling is a very important part of any application and fortunately, WPF and .NET makes it very easy to handle exceptions both locally and globally. You should handle exceptions locally when it makes sense and only use the global handling as a fallback mechanism, since local handling allows you to be more specific and deal with the problem in a more specialized way.
