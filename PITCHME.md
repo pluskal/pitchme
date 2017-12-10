@@ -1,878 +1,854 @@
-# Introduction to WPF panels
+# Introduction to WPF data binding
 
-Panels are one of the most important control types of WPF. They act as containers for other controls and control the layout of your windows/pages. Since a window can only contain ONE child control, a panel is often used to divide up the space into areas, where each area can contain a control or another panel (which is also a control, of course).
+[Wikipedia](http://en.wikipedia.org/wiki/Data_binding) describes the concept of data binding very well:
 
-+++
-
-Panels come in several different flavors, with each of them having its own way of dealing with layout and child controls. Picking the right panel is therefore essential to getting the behavior and layout you want, and especially in the start of your WPF career, this can be a difficult job. The next section will describe each of the panels shortly and give you an idea of when to use it. After that, move on to the next chapters, where each of the panels will be described in detail.
+_Data binding is general technique that binds two data/information sources together and maintains synchronization of data._
 
 +++
 
-## Canvas
-
-A simple panel, which mimics the WinForms way of doing things. It allows you to assign specific coordinates to each of the child controls, giving you total control of the layout. This is not very flexible though, because you have to manually move the child controls around and make sure that they align the way you want them to. Use it (only) when you want complete control of the child control positions.
+With WPF, Microsoft has put data binding in the front seat and once you start learning WPF, you will realize that it's an important aspect of pretty much everything you do. If you come from the world of WinForms, then the huge focus on data binding might scare you a bit, but once you get used to it, you will likely come to love it, as it makes a lot of things cleaner and easier to maintain.
 
 +++
 
-## WrapPanel
-
-The WrapPanel will position each of its child controls next to the other, horizontally (default) or vertically, until there is no more room, where it will wrap to the next line and then continue. Use it when you want a vertical or horizontal list controls that automatically wraps when there's no more room.
+Data binding in WPF is the preferred way to bring data from your code to the UI layer. Sure, you can set properties on a control manually or you can populate a ListBox by adding items to it from a loop, but the cleanest and purest WPF way is to add a binding between the source and the destination UI element.
 
 +++
 
-## StackPanel
+## Agenda
 
-The StackPanel acts much like the WrapPanel, but instead of wrapping if the child controls take up too much room, it simply expands itself, if possible. Just like with the WrapPanel, the orientation can be either horizontal or vertical, but instead of adjusting the width or height of the child controls based on the largest item, each item is stretched to take up the full width or height. Use the StackPanel when you want a list of controls that takes up all the available room, without wrapping.
-
-+++
-
-## DockPanel
-
-The DockPanel allows you to dock the child controls to the top, bottom, left or right. By default, the last control, if not given a specific dock position, will fill the remaining space. You can achieve the same with the Grid panel, but for the simpler situations, the DockPanel will be easier to use. Use the DockPanel whenever you need to dock one or several controls to one of the sides, like for dividing up the window into specific areas.
+In the next chapter, we'll look into a simple example where data binding is used and after that, we'll talk some more about all the possibilities. The concept of data binding is included pretty early in this tutorial, because it's such an integral part of using WPF, which you will see once you explore the rest of the chapters, where it's used almost all of the time.
 
 +++
 
-## Grid
-
-The Grid is probably the most complex of the panel types. A Grid can contain multiple rows and columns. You define a height for each of the rows and a width for each of the columns, in either an absolute amount of pixels, in a percentage of the available space or as auto, where the row or column will automatically adjust its size depending on the content. Use the Grid when the other panels doesn't do the job, e.g. when you need multiple columns and often in combination with the other panels.
-
-+++
-
-## UniformGrid
-
-The UniformGrid is just like the Grid, with the possibility of multiple rows and columns, but with one important difference: All rows and columns will have the same size! Use this when you need the Grid behavior without the need to specify different sizes for the rows and columns.
+However, the more theoretical part of data binding might be too heavy if you just want to get started building a simple WPF application. In that case I suggest that you have a look at the "Hello, bound world!" article to get a glimpse of how data binding works, and then save the rest of the data binding articles for later, when you're ready to get some more theory.
 
 ---
 
-# The Canvas control
+# Hello, bound world!
 
-The Canvas is probably the simplest Panel of them all. It doesn't really do anything by default, it just allows you to put controls in it and then position them yourself using explicit coordinates.
-
-+++
-
-If you have ever used another UI library like WinForms, this will probably make you feel right at home, but while it can be tempting to have absolute control of all the child controls, this also means that the Panel won't do anything for you once the user starts resizing your window, if you localize absolutely positioned text or if the content is scaled.
-
-+++
-
-This one is mostly about showing you just how little the Canvas does by default:
+Just like we started this tutorial with the classic "Hello, world!" example, we'll show you how easy it is to use data binding in WPF with a "Hello, bound world!" example. Let's jump straight into it and then I'll explain it afterwards:
 
 ```XML
-<Window x:Class="WpfTutorialSamples.Panels.Canvas"
+<Window x:Class="WpfTutorialSamples.DataBinding.HelloBoundWorldSample"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Canvas" Height="200" Width="200">
-        <Canvas>
-                <Button>Button 1</Button>
-                <Button>Button 2</Button>
-        </Canvas>
+        Title="HelloBoundWorldSample" Height="110" Width="280">
+    <StackPanel Margin="10">
+                <TextBox Name="txtValue" />
+                <WrapPanel Margin="0,10">
+                        <TextBlock Text="Value: " FontWeight="Bold" />
+                        <TextBlock Text="{Binding Path=Text, ElementName=txtValue}" />
+                </WrapPanel>
+        </StackPanel>
 </Window>
 ```
 
 +++
 
-![A simple Canvas](http://www.wpf-tutorial.com/chapters/panels/images/canvas_simple.png "A simple Canvas")
+![A simple data binding between controls](http://www.wpf-tutorial.com/chapters/data-binding/images/hello_bound_world.png "A simple data binding between controls")
+
+This simple example shows how we bind the value of the TextBlock to match the Text property of the TextBox. As you can see from the screenshot, the TextBlock is automatically updated when you enter text into the TextBox. In a non-bound world, this would require us to listen to an event on the TextBox and then update the TextBlock each time the text changes, but with data binding, this connection can be established just by using markup.
 
 +++
 
-As you can see, even though we have two buttons, they are both placed in the exact same place, so only the last one is visible. The Canvas does absolutely nothing until you start giving coordinates to the child controls. This is done using the Left, Right, Top and Bottom attached properties from the Canvas control.
+## The syntax of a Binding
+
+All the magic happens between the curly braces, which in XAML encapsulates a Markup Extension. For data binding, we use the Binding extension, which allows us to describe the binding relationship for the Text property. In its most simple form, a binding can look like this:
 
 +++
 
-These properties allow you to specify the position relative to the four edges of the Canvas. By default, they are all set to NaN (Not a Number), which will make the Canvas place them in the upper left corner, but as mentioned, you can easily change this:
+{Binding}
 
-```XML
-<Window x:Class="WpfTutorialSamples.Panels.Canvas"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Canvas" Height="200" Width="200">
-        <Canvas>
-                <Button Canvas.Left="10">Top left</Button>
-                <Button Canvas.Right="10">Top right</Button>
-                <Button Canvas.Left="10" Canvas.Bottom="10">Bottom left</Button>
-                <Button Canvas.Right="10" Canvas.Bottom="10">Bottom right</Button>
-        </Canvas>
-</Window>
-```
+This simply returns the current data context (more about that later). This can definitely be useful, but in the most common situations, you would want to bind a property to another property on the data context. A binding like that would look like this:
+
+{Binding Path=NameOfProperty}
+
+The Path notes the property that you want to bind to, however, since Path is the default property of a binding, you may leave it out if you want to, like this:
 
 +++
 
-![A simple Canvas, where we position the child elements](http://www.wpf-tutorial.com/chapters/panels/images/canvas_with_positions.png "A simple Canvas, where we position the child elements")
+{Binding NameOfProperty}
 
-Notice how I only set the property or properties that I need. For the first two buttons, I only wish to specify a value for the X axis, so I use the Left and Right properties to push the buttons towards the center, from each direction.
+You will see many different examples, some of them where Path is explicitly defined and some where it's left out. In the end it's really up to you though.
 
-+++
+A binding has many other properties though, one of them being the ElementName which we use in our example. This allows us to connect directly to another UI element as the source. Each property that we set in the binding is separated by a comma:
 
-For the bottom buttons, I use both Left/Right and Bottom to push them towards the center in both directions. You will usually specify either a Top or a Bottom value and/or a Left or a Right value.
-
-+++
-
-As mentioned, since the Canvas gives you complete control of positions, it won't really care whether or not there's enough room for all your controls or if one is on top of another. This makes it a bad choice for pretty much any kind of dialog design, but the Canvas is, as the name implies, great for at least one thing: Painting. WPF has a bunch of controls that you can place inside a Canvas, to make nice illustrations.
+{Binding Path=Text, ElementName=txtValue}
 
 +++
 
-## Z-Index
+## Summary
 
-In the next example, we'll use a couple of the shape related controls of WPF to illustrate another very important concept when using the Canvas: Z-Index. Normally, if two controls within a Canvas overlaps, the one defined last in the markup will take precedence and overlap the other(s). However, by using the attached ZIndex property on the Panel class, this can easily be changed.
-
-+++
-
-First, an example where we don't use z-index at all:
-
-```XML
-<Window x:Class="WpfTutorialSamples.Panels.CanvasZIndex"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="CanvasZIndex" Height="275" Width="260">
-    <Canvas>
-        <Ellipse Fill="Gainsboro" Canvas.Left="25" Canvas.Top="25" Width="200" Height="200" />
-        <Rectangle Fill="LightBlue" Canvas.Left="25" Canvas.Top="25" Width="50" Height="50" />
-        <Rectangle Fill="LightCoral" Canvas.Left="50" Canvas.Top="50" Width="50" Height="50" />
-        <Rectangle Fill="LightCyan" Canvas.Left="75" Canvas.Top="75" Width="50" Height="50" />
-    </Canvas>
-</Window>
-```
-
-+++
-
-![A Canvas with overlapping elements, not using the ZIndex property](http://www.wpf-tutorial.com/chapters/panels/images/canvas_no_zindex.png "A Canvas with overlapping elements, not using the ZIndex property")
-
-+++
-
-Notice that because each of the rectangles are defined after the circle, they all overlap the circle, and each of them will overlap the previously defined one. Let's try changing that:
-
-```XML
-<Window x:Class="WpfTutorialSamples.Panels.CanvasZIndex"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="CanvasZIndex" Height="275" Width="260">
-    <Canvas>
-        <Ellipse Panel.ZIndex="2" Fill="Gainsboro" Canvas.Left="25" Canvas.Top="25" Width="200" Height="200" />
-        <Rectangle Panel.ZIndex="3" Fill="LightBlue" Canvas.Left="25" Canvas.Top="25" Width="50" Height="50" />
-        <Rectangle Panel.ZIndex="2" Fill="LightCoral" Canvas.Left="50" Canvas.Top="50" Width="50" Height="50" />
-        <Rectangle Panel.ZIndex="4" Fill="LightCyan" Canvas.Left="75" Canvas.Top="75" Width="50" Height="50" />
-    </Canvas>
-</Window>
-```
-
-+++
-
-![A Canvas with overlapping elements, using the ZIndex property](http://www.wpf-tutorial.com/chapters/panels/images/canvas_zindex.png "A Canvas with overlapping elements, using the ZIndex property")
-
-+++
-
-The default ZIndex value is 0, but we assign a new one to each of the shapes. The rule is that the element with the higher z-index overlaps the ones with the lower values. If two values are identical, the last defined element "wins". As you can see from the screenshot, changing the ZIndex property gives quite another look.
+This was just a glimpse of all the binding possibilities of WPF. In the next chapters, we'll discover more of them, to show you just how powerful data binding is.
 
 ---
 
-# The WrapPanel control
+# Using the DataContext
 
-The **WrapPanel** will position each of its child controls next to the other, horizontally (default) or vertically, until there is no more room, where it will wrap to the next line and then continue. Use it when you want a vertical or horizontal list controls that automatically wraps when there's no more room.
-
-+++
-
-When the WrapPanel uses the Horizontal orientation, the child controls will be given the same height, based on the tallest item. When the WrapPanel is the Vertical orientation, the child controls will be given the same width, based on the widest item.
+The DataContext property is the default source of your bindings, unless you specifically declare another source, like we did in the previous chapter with the ElementName property. It's defined on the FrameworkElement class, which most UI controls, including the WPF Window, inherits from. Simply put, it allows you to specify a basis for your bindings
 
 +++
 
-In the first example, we'll check out a WrapPanel with the default (Horizontal) orientation:
+There's no default source for the DataContext property (it's simply null from the start), but since a DataContext is inherited down through the control hierarchy, you can set a DataContext for the Window itself and then use it throughout all of the child controls. Let's try illustrating that with a simple example:
+
++++
 
 ```XML
-<Window x:Class="WpfTutorialSamples.Panels.WrapPanel"
+<Window x:Class="WpfTutorialSamples.DataBinding.DataContextSample"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="WrapPanel" Height="300" Width="300">
-        <WrapPanel>
-                <Button>Test button 1</Button>
-                <Button>Test button 2</Button>
-                <Button>Test button 3</Button>
-                <Button Height="40">Test button 4</Button>
-                <Button>Test button 5</Button>
-                <Button>Test button 6</Button>
+        Title="DataContextSample" Height="130" Width="280">
+        <StackPanel Margin="15">
+                <WrapPanel>
+                        <TextBlock Text="Window title:  " />
+                        <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" Width="150" />
+                </WrapPanel>
+                <WrapPanel Margin="0,10,0,0">
+                        <TextBlock Text="Window dimensions: " />
+                        <TextBox Text="{Binding Width}" Width="50" />
+                        <TextBlock Text=" x " />
+                        <TextBox Text="{Binding Height}" Width="50" />
+                </WrapPanel>
+        </StackPanel>
+</Window>
+```
+
++++
+
+```C#
+using System;
+using System.Windows;
+
+namespace WpfTutorialSamples.DataBinding
+{
+        public partial class DataContextSample : Window
+        {
+                public DataContextSample()
+                {
+                        InitializeComponent();
+                        this.DataContext = this;
+                }
+        }
+}
+```
+
++++
+
+![Several data bindings using the DataContext](http://www.wpf-tutorial.com/chapters/data-binding/images/datacontext.png "Several data bindings using the DataContext")
+
+The Code-behind for this example only adds one line of interesting code: After the standard InitalizeComponent() call, we assign the "this" reference to the DataContext, which basically just tells the Window that we want itself to be the data context.
+
++++
+
+In the XAML, we use this fact to bind to several of the Window properties, including Title, Width and Height. Since the window has a DataContext, which is passed down to the child controls, we don't have to define a source on each of the bindings - we just use the values as if they were globally available.
+
+Try running the example and resize the window - you will see that the dimension changes are immediately reflected in the textboxes. You can also try writing a different title in the first textbox, but you might be surprised to see that this change is not reflected immediately. Instead, you have to move the focus to another control before the change is applied. Why? Well, that's the subject for the next chapter.
+
++++
+
+## Summary
+
+Using the DataContext property is like setting the basis of all bindings down through the hierarchy of controls. This saves you the hassle of manually defining a source for each binding, and once you really start using data bindings, you will definitely appreciate the time and typing saved.
+
+However, this doesn't mean that you have to use the same DataContext for all controls within a Window. Since each control has its own DataContext property, you can easily break the chain of inheritance and override the DataContext with a new value. This allows you to do stuff like having a global DataContext on the window and then a more local and specific DataContext on e.g. a panel holding a separate form or something along those lines.
+
+---
+
+# The UpdateSourceTrigger property
+
+In the previous article we saw how changes in a TextBox was not immediately sent back to the source. Instead, the source was updated only after focus was lost on the TextBox. This behavior is controlled by a property on the binding called **UpdateSourceTrigger**. It defaults to the value "Default", which basically means that the source is updated based on the property that you bind to. As of writing, all properties except for the Text property, is updated as soon as the property changes (PropertyChanged), while the Text property is updated when focus on the destination element is lost (LostFocus).
+
++++
+
+Default is, obviously, the default value of the UpdateSourceTrigger. The other options are **PropertyChanged**, **LostFocus** and **Explicit**. The first two has already been described, while the last one simply means that the update has to be pushed manually through to occur, using a call to UpdateSource on the Binding.
+
+To see how all of these options work, I have updated the example from the previous chapter to show you all of them:
+
++++
+
+```XML
+Download sample
+<Window x:Class="WpfTutorialSamples.DataBinding.DataContextSample"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="DataContextSample" Height="130" Width="310">
+        <StackPanel Margin="15">
+                <WrapPanel>
+                        <TextBlock Text="Window title:  " />
+                        <TextBox Name="txtWindowTitle" Text="{Binding Title, UpdateSourceTrigger=Explicit}" Width="150" />
+                        <Button Name="btnUpdateSource" Click="btnUpdateSource_Click" Margin="5,0" Padding="5,0">*</Button>
+                </WrapPanel>
+                <WrapPanel Margin="0,10,0,0">
+                        <TextBlock Text="Window dimensions: " />
+                        <TextBox Text="{Binding Width, UpdateSourceTrigger=LostFocus}" Width="50" />
+                        <TextBlock Text=" x " />
+                        <TextBox Text="{Binding Height, UpdateSourceTrigger=PropertyChanged}" Width="50" />
+                </WrapPanel>
+        </StackPanel>
+</Window>
+```
+
++++
+
+```C#
+using System;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+
+namespace WpfTutorialSamples.DataBinding
+{
+        public partial class DataContextSample : Window
+        {
+                public DataContextSample()
+                {
+                        InitializeComponent();
+                        this.DataContext = this;
+                }
+
+                private void btnUpdateSource_Click(object sender, RoutedEventArgs e)
+                {
+                        BindingExpression binding = txtWindowTitle.GetBindingExpression(TextBox.TextProperty);
+                        binding.UpdateSource();
+                }
+        }
+}
+```
+
++++
+
+![Several data bindings, each using different UpdateSourceTrigger values](http://www.wpf-tutorial.com/chapters/data-binding/images/update_source_trigger.png "Several data bindings, each using different UpdateSourceTrigger values")
+
+As you can see, each of the three textboxes now uses a different **UpdateSourceTrigger**.
+
++++
+
+The first one is set to **Explicit**, which basically means that the source won't be updated unless you manually do it. For that reason, I have added a button next to the TextBox, which will update the source value on demand. In the Code-behind, you will find the Click handler, where we use a couple of lines of code to get the binding from the destination control and then call the UpdateSource() method on it.
+
+The second TextBox uses the **LostFocus** value, which is actually the default for a Text binding. It means that the source value will be updated each time the destination control loses focus.
+
++++
+
+The third and last TextBox uses the **PropertyChanged** value, which means that the source value will be updated each time the bound property changes, which it does in this case as soon as the text changes.
+
+Try running the example on your own machine and see how the three textboxes act completely different: The first value doesn't update before you click the button, the second value isn't updated until you leave the TextBox, while the third value updates automatically on each keystroke, text change etc.
+
++++
+
+## Summary
+
+The UpdateSourceTrigger property of a binding controls how and when a changed value is sent back to the source. However, since WPF is pretty good at controlling this for you, the default value should suffice for most cases, where you will get the best mix of a constantly updated UI and good performance.
+
++++
+
+For those situations where you need more control of the process, this property will definitely help though. Just make sure that you don't update the source value more often than you actually need to. If you want the full control, you can use the **Explicit** value and then do the updates manually, but this does take a bit of the fun out of working with data bindings.
+
+---
+
+# Responding to changes
+
+So far in this tutorial, we have mostly created bindings between UI elements and existing classes, but in real life applications, you will obviously be binding to your own data objects. This is just as easy, but once you start doing it, you might discover something that disappoints you: Changes are not automatically reflected, like they were in previous examples. As you will learn in this article, you need just a bit of extra work for this to happen, but fortunately, WPF makes this pretty easy.
+
++++
+
+## Responding to data source changes
+
+There are two different scenarios that you may or may not want to handle when dealing with data source changes: Changes to the list of items and changes in the bound properties in each of the data objects. How to handle them may vary, depending on what you're doing and what you're looking to accomplish, but WPF comes with two very easy solutions that you can use: The **ObservableCollection** and the **INotifyPropertyChanged** interface.
+
++++
+
+**The following example will show you why we need these two things:**
+
+```XML
+<Window x:Class="WpfTutorialSamples.DataBinding.ChangeNotificationSample"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ChangeNotificationSample" Height="150" Width="300">
+        <DockPanel Margin="10">
+                <StackPanel DockPanel.Dock="Right" Margin="10,0,0,0">
+                        <Button Name="btnAddUser" Click="btnAddUser_Click">Add user</Button>
+                        <Button Name="btnChangeUser" Click="btnChangeUser_Click" Margin="0,5">Change user</Button>
+                        <Button Name="btnDeleteUser" Click="btnDeleteUser_Click">Delete user</Button>
+                </StackPanel>
+                <ListBox Name="lbUsers" DisplayMemberPath="Name"></ListBox>
+        </DockPanel>
+</Window>
+```
+
++++
+
+```C#
+using System;
+using System.Collections.Generic;
+using System.Windows;
+
+namespace WpfTutorialSamples.DataBinding
+{
+        public partial class ChangeNotificationSample : Window
+        {
+                private List<User> users = new List<User>();
+
+                public ChangeNotificationSample()
+                {
+                        InitializeComponent();
+
+                        users.Add(new User() { Name = "John Doe" });
+                        users.Add(new User() { Name = "Jane Doe" });
+
+                        lbUsers.ItemsSource = users;
+                }
+
+                private void btnAddUser_Click(object sender, RoutedEventArgs e)
+                {
+                        users.Add(new User() { Name = "New user" });
+                }
+
+                private void btnChangeUser_Click(object sender, RoutedEventArgs e)
+                {
+                        if(lbUsers.SelectedItem != null)
+                                (lbUsers.SelectedItem as User).Name = "Random Name";
+                }
+
+                private void btnDeleteUser_Click(object sender, RoutedEventArgs e)
+                {
+                        if(lbUsers.SelectedItem != null)
+                                users.Remove(lbUsers.SelectedItem as User);
+                }
+        }
+
+        public class User
+        {
+                public string Name { get; set; }
+        }
+}
+```
+
++++
+
+![Not receiving change notifications](http://www.wpf-tutorial.com/chapters/data-binding/images/change_notification1.png "Not receiving change notifications")
+
++++
+
+Try running it for yourself and watch how even though you add something to the list or change the name of one of the users, **nothing in the UI is updated**. The example is pretty simple, with a User class that will keep the name of the user, a ListBox to show them in and some buttons to manipulate both the list and its contents. The ItemsSource of the list is assigned to a quick list of a couple of users that we create in the window constructor. The problem is that none of the buttons seems to work. Let's fix that, in two easy steps.
+
++++
+
+## Reflecting changes in the list data source
+
+The first step is to get the UI to respond to changes in the list source (ItemsSource), like when we add or delete a user. What we need is a list that notifies any destinations of changes to its content, and fortunately, WPF provides a type of list that will do just that. It's called ObservableCollection, and you use it much like a regular List<T>, with only a few differences.
+
++++
+
+In the final example, which you will find below, we have simply replaced the List<User> with an ObservableCollection<User> - that's all it takes! This will make the Add and Delete button work, but it won't do anything for the "Change name" button, because the change will happen on the bound data object itself and not the source list - the second step will handle that scenario though.
+
++++
+
+## Reflecting changes in the data objects
+
+The second step is to let our custom User class implement the INotifyPropertyChanged interface. By doing that, our User objects are capable of alerting the UI layer of changes to its properties. This is a bit more cumbersome than just changing the list type, like we did above, but it's still one of the simplest way to accomplish these automatic updates.
+
++++
+
+## The final and working example
+
+With the two changes described above, we now have an example that WILL reflect changes in the data source. It looks like this:
+
+```XML
+<Window x:Class="WpfTutorialSamples.DataBinding.ChangeNotificationSample"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ChangeNotificationSample" Height="135" Width="300">
+        <DockPanel Margin="10">
+                <StackPanel DockPanel.Dock="Right" Margin="10,0,0,0">
+                        <Button Name="btnAddUser" Click="btnAddUser_Click">Add user</Button>
+                        <Button Name="btnChangeUser" Click="btnChangeUser_Click" Margin="0,5">Change user</Button>
+                        <Button Name="btnDeleteUser" Click="btnDeleteUser_Click">Delete user</Button>
+                </StackPanel>
+                <ListBox Name="lbUsers" DisplayMemberPath="Name"></ListBox>
+        </DockPanel>
+</Window>
+```
+
++++
+
+```C#
+using System;
+using System.Collections.Generic;
+using System.Windows;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
+
+namespace WpfTutorialSamples.DataBinding
+{
+        public partial class ChangeNotificationSample : Window
+        {
+                private ObservableCollection<User> users = new ObservableCollection<User>();
+
+                public ChangeNotificationSample()
+                {
+                        InitializeComponent();
+
+                        users.Add(new User() { Name = "John Doe" });
+                        users.Add(new User() { Name = "Jane Doe" });
+
+                        lbUsers.ItemsSource = users;
+                }
+
+                private void btnAddUser_Click(object sender, RoutedEventArgs e)
+                {
+                        users.Add(new User() { Name = "New user" });
+                }
+
+                private void btnChangeUser_Click(object sender, RoutedEventArgs e)
+                {
+                        if(lbUsers.SelectedItem != null)
+                                (lbUsers.SelectedItem as User).Name = "Random Name";
+                }
+
+                private void btnDeleteUser_Click(object sender, RoutedEventArgs e)
+                {
+                        if(lbUsers.SelectedItem != null)
+                                users.Remove(lbUsers.SelectedItem as User);
+                }
+        }
+
+        public class User : INotifyPropertyChanged
+        {
+                private string name;
+                public string Name {
+                        get { return this.name; }
+                        set
+                        {
+                                if(this.name != value)
+                                {
+                                        this.name = value;
+                                        this.NotifyPropertyChanged("Name");
+                                }
+                        }
+                }
+
+                public event PropertyChangedEventHandler PropertyChanged;
+
+                public void NotifyPropertyChanged(string propName)
+                {
+                        if(this.PropertyChanged != null)
+                                this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
+                }
+        }
+}
+```
+
++++
+
+![Receiving change notifications](http://www.wpf-tutorial.com/chapters/data-binding/images/change_notification2.png "Receiving change notifications")
+
++++
+
+## Summary
+
+As you can see, implementing INotifyPropertyChanged is pretty easy, but it does create a bit of extra code on your classes, and adds a bit of extra logic to your properties. This is the price you will have to pay if you want to bind to your own classes and have the changes reflected in the UI immediately. Obviously you only have to call NotifyPropertyChanged in the setter's of the properties that you bind to - the rest can remain the way they are.
+
+The ObservableCollection on the other hand is very easy to deal with - it simply requires you to use this specific list type in those situations where you want changes to the source list reflected in a binding destination.
+
+---
+
+# Value conversion with IValueConverter
+
+So far we have used some simple data bindings, where the sending and receiving property was always compatible. However, you will soon run into situations where you want to use a bound value of one type and then present it slightly differently.
+
++++
+
+## When to use a value converter
+
+Value converters are very frequently used with data bindings. Here are some basic examples:
+
+*   You have a numeric value but you want to show zero values in one way and positive numbers in another way
+*   You want to check a CheckBox based on a value, but the value is a string like "yes" or "no" instead of a Boolean value
+*   You have a file size in bytes but you wish to show it as bytes, kilobytes, megabytes or gigabytes based on how big it is
+
++++
+
+These are some of the simple cases, but there are many more. For instance, you may want to check a checkbox based on a Boolean value, but you want it reversed, so that the CheckBox is checked if the value is false and not checked if the value is true. You can even use a converter to generate an image for an ImageSource, based on the value, like a green sign for true or a red sign for false - the possibilities are pretty much endless!
+
+For cases like this, you can use a value converter. These small classes, which implement the IValueConverter interface, will act like middlemen and translate a value between the source and the destination. So, in any situation where you need to transform a value before it reaches its destination or back to its source again, you likely need a converter.
+
++++
+
+## Implementing a simple value converter
+
+As mentioned, a WPF value converter needs to implement the IValueConverter interface, or alternatively, the IMultiValueConverter interface (more about that one later). Both interfaces just requires you to implement two methods: Convert() and ConvertBack(). As the name implies, these methods will be used to convert the value to the destination format and then back again.
+
+Let's implement a simple converter which takes a string as input and then returns a Boolean value, as well as the other way around. If you're new to WPF, and you likely are since you're reading this tutorial, then you might not know all of the concepts used in the example, but don't worry, they will all be explained after the code listings:
+
++++
+
+```XML
+Download sample
+<Window x:Class="WpfTutorialSamples.DataBinding.ConverterSample"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:local="clr-namespace:WpfTutorialSamples.DataBinding"
+        Title="ConverterSample" Height="140" Width="250">
+        <Window.Resources>
+                <local:YesNoToBooleanConverter x:Key="YesNoToBooleanConverter" />
+        </Window.Resources>
+        <StackPanel Margin="10">
+                <TextBox Name="txtValue" />
+                <WrapPanel Margin="0,10">
+                        <TextBlock Text="Current value is: " />
+                        <TextBlock Text="{Binding ElementName=txtValue, Path=Text, Converter={StaticResource YesNoToBooleanConverter}}"></TextBlock>
+                </WrapPanel>
+                <CheckBox IsChecked="{Binding ElementName=txtValue, Path=Text, Converter={StaticResource YesNoToBooleanConverter}}" Content="Yes" />
+        </StackPanel>
+</Window>
+```
+
++++
+
+```C#
+using System;
+using System.Windows;
+using System.Windows.Data;
+
+namespace WpfTutorialSamples.DataBinding
+{
+        public partial class ConverterSample : Window
+        {
+                public ConverterSample()
+                {
+                        InitializeComponent();
+                }
+        }
+
+        public class YesNoToBooleanConverter : IValueConverter
+        {
+                public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+                {
+                        switch(value.ToString().ToLower())
+                        {
+                                case "yes":
+                                case "oui":
+                                        return true;
+                                case "no":
+                                case "non":
+                                        return false;
+                        }
+                        return false;
+                }
+
+                public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+                {
+                        if(value is bool)
+                        {
+                                if((bool)value == true)
+                                        return "yes";
+                                else
+                                        return "no";
+                        }
+                        return "no";
+                }
+        }
+}
+```
+
++++
+
+![Using an IValueConverter, here with an empty value](http://www.wpf-tutorial.com/chapters/data-binding/images/converter_simple_no_value.png "Using an IValueConverter, here with an empty value")
+
++++
+ 
+![Using an IValueConverter, here with a value that converts to false](http://www.wpf-tutorial.com/chapters/data-binding/images/converter_simple_false.png "Using an IValueConverter, here with a value that converts to false") 
+
++++
+
+![Using an IValueConverter, here with a value that converts to true](http://www.wpf-tutorial.com/chapters/data-binding/images/converter_simple.png "Using an IValueConverter, here with a value that converts to true")
+
++++
+
+
+## Code-behind
+
+So, let's start from the back and then work our way through the example. We have implemented a converter in the Code-behind file called YesNoToBooleanConverter. As advertised, it just implements the two required methods, called Convert() and ConvertBack(). The Convert() methods assumes that it receives a string as the input (the _value_ parameter) and then converts it to a Boolean true or false value, with a fallback value of false. For fun, I added the possibility to do this conversion from French words as well.
+
++++
+
+The ConvertBack() method obviously does the opposite: It assumes an input value with a Boolean type and then returns the English word "yes" or "no" in return, with a fallback value of "no".
+
+You may wonder about the additional parameters that these two methods take, but they're not needed in this example. We'll use them in one of the next chapters, where they will be explained.
+
++++
+
+## XAML
+
+In the XAML part of the program, we start off by declaring an instance of our converter as a resource for the window. We then have a TextBox, a couple of TextBlocks and a CheckBox control and this is where the interesting things are happening: We bind the value of the TextBox to the TextBlock and the CheckBox control and using the Converter property and our own converter reference, we juggle the values back and forth between a string and a Boolean value, depending on what's needed.
+
+If you try to run this example, you will be able to change the value in two places: By writing "yes" in the TextBox (or any other value, if you want false) or by checking the CheckBox. No matter what you do, the change will be reflected in the other control as well as in the TextBlock.
+
++++
+
+## Summary
+
+This was an example of a simple value converter, made a bit longer than needed for illustrational purposes. In the next chapter we'll look into a more advanced example, but before you go out and write your own converter, you might want to check if WPF already includes one for the purpose. As of writing, there are more than 20 built-in converters that you may take advantage of, but you need to know their name. I found the following list which might come in handy for you: [http://stackoverflow.com/questions/505397/built-in-wpf-ivalueconverters](http://stackoverflow.com/questions/505397/built-in-wpf-ivalueconverters)
+
+---
+
+# The StringFormat property
+
+As we saw in the previous chapters, the way to manipulate the output of a binding before is shown is typically through the use of a converter. The cool thing about the converters is that they allow you to convert any data type into a completely different data type. However, for more simple usage scenarios, where you just want to change the way a certain value is shown and not necessarily convert it into a different type, the **StringFormat** property might very well be enough.
+
++++
+
+Using the StringFormat property of a binding, you lose some of the flexibility you get when using a converter, but in return, it's much simpler to use and doesn't involve the creation of a new class in a new file.
+
+The StringFormat property does exactly what the name implies: It formats the output string, simply by calling the String.Format method. Sometimes an example says more than a thousand words, so before I hit that word count, let's jump straight into an example:
+
++++
+
+```XML
+<Window x:Class="WpfTutorialSamples.DataBinding.StringFormatSample"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:system="clr-namespace:System;assembly=mscorlib"
+        Title="StringFormatSample" Height="150" Width="250"
+                Name="wnd">
+        <StackPanel Margin="10">
+                <TextBlock Text="{Binding ElementName=wnd, Path=ActualWidth, StringFormat=Window width: {0:#,#.0}}" />
+                <TextBlock Text="{Binding ElementName=wnd, Path=ActualHeight, StringFormat=Window height: {0:C}}" />
+                <TextBlock Text="{Binding Source={x:Static system:DateTime.Now}, StringFormat=Date: {0:dddd, MMMM dd}}" />
+                <TextBlock Text="{Binding Source={x:Static system:DateTime.Now}, StringFormat=Time: {0:HH:mm}}" />
+        </StackPanel>
+</Window>
+```
+
++++
+
+![Several data bindings using the StringFormat property to control the output](http://www.wpf-tutorial.com/chapters/data-binding/images/stringformat.png "Several data bindings using the StringFormat property to control the output")
+
++++
+
+The first couple of TextBlock's gets their value by binding to the parent Window and getting its width and height. Through the StringFormat property, the values are formatted. For the width, we specify a custom formatting string and for the height, we ask it to use the currency format, just for fun. The value is saved as a double type, so we can use all the same format specifiers as if we had called double.ToString(). You can find a list of them here: [http://msdn.microsoft.com/en-us/library/dwhawy9k.aspx](http://msdn.microsoft.com/en-us/library/dwhawy9k.aspx)
+
+Also notice how I can include custom text in the StringFormat - this allows you to pre/post-fix the bound value with text as you please. When referencing the actual value inside the format string, we surround it by a set of curly braces, which includes two values: A reference to the value we want to format (value number 0, which is the first possible value) and the format string, separated by a colon.
+
++++
+
+For the last two values, we simply bind to the current date (DateTime.Now) and the output it first as a date, in a specific format, and then as the time (hours and minutes), again using our own, pre-defined format. You can read more about DateTime formatting here: [http://msdn.microsoft.com/en-us/library/az4se3k1.aspx](http://msdn.microsoft.com/en-us/library/az4se3k1.aspx)
+
++++
+
+## Formatting without extra text
+
+Please be aware that if you specify a format string that doesn't include any custom text, which all of the examples above does, then you need to add an extra set of curly braces, when defining it in XAML. The reason is that WPF may otherwise confuse the syntax with the one used for Markup Extensions. Here's an example:
+
+```XML
+<Window x:Class="WpfTutorialSamples.DataBinding.StringFormatSample"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:system="clr-namespace:System;assembly=mscorlib"
+        Title="StringFormatSample" Height="150" Width="250"
+                Name="wnd">
+        <WrapPanel Margin="10">
+                <TextBlock Text="Width: " />
+                <TextBlock Text="{Binding ElementName=wnd, Path=ActualWidth, StringFormat={}{0:#,#.0}}" />
         </WrapPanel>
 </Window>
 ```
 
 +++
 
-![WrapPanel in Horizontal mode](http://www.wpf-tutorial.com/chapters/panels/images/wrappanel_horizontal.png "WrapPanel in Horizontal mode")
+## Using a specific Culture
 
-+++
-
-Notice how I set a specific height on one of the buttons in the second row. In the resulting screenshot, you will see that this causes the entire row of buttons to have the same height instead of the height required, as seen on the first row. You will also notice that the panel does exactly what the name implies: It wraps the content when it can't fit any more of it in. In this case, the fourth button couldn't fit in on the first line, so it automatically wraps to the next line.
-
-+++
-
-Should you make the window, and thereby the available space, smaller, you will see how the panel immediately adjusts to it:
-
-![WrapPanel in Horizontal mode](http://www.wpf-tutorial.com/chapters/panels/images/wrappanel_horizontal_smaller.png "WrapPanel in Horizontal mode")
-
-+++
-
-All of this behavior is also true when you set the Orientation to Vertical. Here's the exact same example as before, but with a Vertical WrapPanel:
+If you need to output a bound value in accordance with a specific culture, that's no problem. The Binding will use the language specified for the parent element, or you can specify it directly for the binding, using the ConverterCulture property. Here's an example:
 
 ```XML
-<Window x:Class="WpfTutorialSamples.Panels.WrapPanel"
+<Window x:Class="WpfTutorialSamples.DataBinding.StringFormatCultureSample"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="WrapPanel" Height="120" Width="300">
-        <WrapPanel Orientation="Vertical">
-                <Button>Test button 1</Button>
-                <Button>Test button 2</Button>
-                <Button>Test button 3</Button>
-                <Button Width="140">Test button 4</Button>
-                <Button>Test button 5</Button>
-                <Button>Test button 6</Button>
-        </WrapPanel>
-</Window>
-```
-
-+++
-
-![WrapPanel in Vertical mode](http://www.wpf-tutorial.com/chapters/panels/images/wrappanel_vertical.png "WrapPanel in Vertical mode")
-
-+++
-
-You can see how the buttons go vertical instead of horizontal, before they wrap because they reach the bottom of the window. In this case, I gave a wider width to the fourth button, and you will see that the buttons in the same column also gets the same width, just like we saw with the button height in the Horizontal example.
-
-+++
-
-Please be aware that while the Horizontal WrapPanel will match the height in the same row and the Vertical WrapPanel will match the width in the same column, height is not matched in a Vertical WrapPanel and width is not matched in a Horizontal WrapPanel. Take a look in this example, which is the Vertical WrapPanel but where the fourth button gets a custom width AND height:
-
-```XML
-<Button Width="140" Height="44">Test button 4</Button>
-```
-
-+++
-
-It will look like this:
-
-![WrapPanel in Vertical mode with specific width/heights](http://www.wpf-tutorial.com/chapters/panels/images/wrappanel_vertical_width_and_height.png "WrapPanel in Vertical mode with specific width/heights")
-
-Notice how button 5 only uses the width - it doesn't care about the height, although it causes the sixth button to be pushed to a new column.
-
----
-
-# The StackPanel control
-
-The **StackPanel** is very similar to the WrapPanel, but with at least one important difference: The StackPanel doesn't wrap the content. Instead it stretches it content in one direction, allowing you to stack item after item on top of each other. Let's first try a very simple example, much like we did with the WrapPanel:
-
-+++
-
-```XML
-<Window x:Class="WpfTutorialSamples.Panels.StackPanel"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="StackPanel" Height="160" Width="300">
-        <StackPanel>
-                <Button>Button 1</Button>
-                <Button>Button 2</Button>
-                <Button>Button 3</Button>
-                <Button>Button 4</Button>
-                <Button>Button 5</Button>
-                <Button>Button 6</Button>
+                xmlns:system="clr-namespace:System;assembly=mscorlib"
+        Title="StringFormatCultureSample" Height="120" Width="300">
+        <StackPanel Margin="10">
+                <TextBlock Text="{Binding Source={x:Static system:DateTime.Now}, ConverterCulture='de-DE', StringFormat=German date: {0:D}}" />
+                <TextBlock Text="{Binding Source={x:Static system:DateTime.Now}, ConverterCulture='en-US', StringFormat=American date: {0:D}}" />
+                <TextBlock Text="{Binding Source={x:Static system:DateTime.Now}, ConverterCulture='ja-JP', StringFormat=Japanese date: {0:D}}" />
         </StackPanel>
 </Window>
 ```
 
 +++
 
-![A simple StackPanel in Vertical mode](http://www.wpf-tutorial.com/chapters/panels/images/stackpanel_vertical_simple.png "A simple StackPanel in Vertical mode")
+![Several data bindings using the StringFormat property, with a specific ConverterCulture, to control the output](http://www.wpf-tutorial.com/chapters/data-binding/images/stringformat_culture.png "Several data bindings using the StringFormat property, with a specific ConverterCulture, to control the output")
+
+It's pretty simple: By combining the StringFormat property, which uses the D specifier (Long date pattern) and the ConverterCulture property, we can output the bound values in accordance with a specific culture. Pretty nifty!
 
 +++
 
-The first thing you should notice is how the StackPanel doesn't really care whether or not there's enough room for the content. It doesn't wrap the content in any way and it doesn't automatically provide you with the ability to scroll (you can use a ScrollViewer control for that though - more on that in a later chapter).
+# Debugging data bindings
 
-+++
-
-You might also notice that the default orientation of the StackPanel is Vertical, unlike the WrapPanel where the default orientation is Horizontal. But just like for the WrapPanel, this can easily be changed, using the Orientation property:
+Since data bindings are evaluated at runtime, and no exceptions are thrown when they fail, a bad binding can sometimes be very hard to track down. These problems can occur in several different situations, but a common issue is when you try to bind to a property that doesn't exist, either because you remembered its name wrong or because you simply misspelled it. Here's an example:
 
 ```XML
-<StackPanel Orientation="Horizontal">
-```
-
-+++
-
-![A simple StackPanel in Horizontal mode](http://www.wpf-tutorial.com/chapters/panels/images/stackpanel_horizontal_simple.png "A simple StackPanel in Horizontal mode")
-
-+++
-
-Another thing you will likely notice is that the StackPanel stretches its child control by default. On a vertically aligned StackPanel, like the one in the first example, all child controls get stretched horizontally. On a horizontally aligned StackPanel, all child controls get stretched vertically, as seen above. The StackPanel does this by setting the HorizontalAlignment or VerticalAlignment property on its child controls to Stretch, but you can easily override this if you want to. 
-
-+++
-
-Have a look at the next example, where we use the same markup as we did in the previous example, but this time we assign values to the VerticalAlignment property for all the child controls:
-
-```XML
-<Window x:Class="WpfTutorialSamples.Panels.StackPanel"
+<Window x:Class="WpfTutorialSamples.DataBinding.DataBindingDebuggingSample"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="StackPanel" Height="160" Width="300">
-        <StackPanel Orientation="Horizontal">
-                <Button VerticalAlignment="Top">Button 1</Button>
-                <Button VerticalAlignment="Center">Button 2</Button>
-                <Button VerticalAlignment="Bottom">Button 3</Button>
-                <Button VerticalAlignment="Bottom">Button 4</Button>
-                <Button VerticalAlignment="Center">Button 5</Button>
-                <Button VerticalAlignment="Top">Button 6</Button>
-        </StackPanel>
+        Title="DataBindingDebuggingSample" Height="100" Width="200">
+    <Grid Margin="10" Name="pnlMain">
+                <TextBlock Text="{Binding NonExistingProperty, ElementName=pnlMain}" />
+        </Grid>
 </Window>
 ```
 
 +++
 
-![A StackPanel in Vertical mode with differently aligned controls](http://www.wpf-tutorial.com/chapters/panels/images/stackpanel_children_vertical_alignment.png "A StackPanel in Vertical mode with differently aligned controls")
+## The Output window
+
+The first place you will want to look is the Visual Studio Output window. It should be at the bottom of your Visual Studio window, or you can activate it by using the [Ctrl+Alt+O] shortcut. There will be loads of output from the debugger, but somewhere you should find a line like this, when running the above example:
+
+_System.Windows.Data Error: 40 : BindingExpression path error: 'NonExistingProperty' property not found on 'object' ''Grid' (Name='pnlMain')'. BindingExpression:Path=NonExistingProperty; DataItem='Grid' (Name='pnlMain'); target element is 'TextBlock' (Name=''); target property is 'Text' (type 'String')_
 
 +++
 
-We use the Top, Center and Bottom values to place the buttons in a nice pattern, just for kicks. The same can of course be done for a vertically aligned StackPanel, where you would use the HorizontalAlignment on the child controls:
+This might seem a bit overwhelming, mainly because no linebreaks are used in this long message, but the important part is this:
 
-```XML
-<Window x:Class="WpfTutorialSamples.Panels.StackPanel"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="StackPanel" Height="160" Width="300">
-        <StackPanel Orientation="Vertical">
-                <Button HorizontalAlignment="Left">Button 1</Button>
-                <Button HorizontalAlignment="Center">Button 2</Button>
-                <Button HorizontalAlignment="Right">Button 3</Button>
-                <Button HorizontalAlignment="Right">Button 4</Button>
-                <Button HorizontalAlignment="Center">Button 5</Button>
-                <Button HorizontalAlignment="Left">Button 6</Button>
-        </StackPanel>
-</Window>
-```
+_'NonExistingProperty' property not found on 'object' ''Grid' (Name='pnlMain')'._
+
+It tells you that you have tried to use a property called "NonExistingProperty" on an object of the type Grid, with the name pnlMain. That's actually pretty concise and should help you correct the name of the property or bind to the real object, if that's the problem.
 
 +++
 
-![A StackPanel in Horizontal mode with differently aligned controls](http://www.wpf-tutorial.com/chapters/panels/images/stackpanel_children_horizontal_alignment.png "A StackPanel in Horizontal mode with differently aligned controls")
+## Adjusting the trace level
 
-As you can see, the controls still go from top to bottom, but instead of having the same width, each control is aligned to the left, the right or center.
-
----
-
-# The DockPanel control
-
-The **DockPanel** makes it easy to dock content in all four directions (top, bottom, left and right). This makes it a great choice in many situations, where you want to divide the window into specific areas, especially because by default, the last element inside the DockPanel, unless this feature is specifically disabled, will automatically fill the rest of the space (center).
-
-+++
-
-As we've seen with many of the other panels in WPF, you start taking advantage of the panel possibilities by using an attached property of it, in this case the DockPanel.Dock property, which decides in which direction you want the child control to dock to. If you don't use this, the first control(s) will be docked to the left, with the last one taking up the remaining space. Here's an example on how you use it:
-
-+++
-
-```XML
-<Window x:Class="WpfTutorialSamples.Panels.DockPanel"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="DockPanel" Height="250" Width="250">
-        <DockPanel>
-                <Button DockPanel.Dock="Left">Left</Button>
-                <Button DockPanel.Dock="Top">Top</Button>
-                <Button DockPanel.Dock="Right">Right</Button>
-                <Button DockPanel.Dock="Bottom">Bottom</Button>
-                <Button>Center</Button>
-        </DockPanel>
-</Window>
-```
-
-+++
-
-![A simple DockPanel](http://www.wpf-tutorial.com/chapters/panels/images/dockpanel_simple.png "A simple DockPanel")
-
-+++
-
-As already mentioned, we don't assign a dock position for the last child, because it automatically centers the control, allowing it to fill the remaining space. You will also notice that the controls around the center only takes up the amount of space that they need - everything else is left for the center position. That is also why you will see the Right button take up a bit more space than the Left button - the extra character in the text simply requires more pixels.
-
-+++
-
-The last thing that you will likely notice, is how the space is divided. For instance, the Top button doesn't get all of the top space, because the Left button takes a part of it. The DockPanel decides which control to favor by looking at their position in the markup. In this case, the Left button gets precedence because it's placed first in the markup. Fortunately, this also means that it's very easy to change, as we'll see in the next example, where we have also evened out the space a bit by assigning widths/heights to the child controls:
-
-+++
-
-```XML
-<Window x:Class="WpfTutorialSamples.Panels.DockPanel"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="DockPanel" Height="250" Width="250">
-        <DockPanel>
-                <Button DockPanel.Dock="Top" Height="50">Top</Button>
-                <Button DockPanel.Dock="Bottom" Height="50">Bottom</Button>
-                <Button DockPanel.Dock="Left" Width="50">Left</Button>
-                <Button DockPanel.Dock="Right" Width="50">Right</Button>        
-                <Button>Center</Button>
-        </DockPanel>
-</Window>
-```
-
-+++
-
-![A DockPanel where width or heights has been specified for the child controls](http://www.wpf-tutorial.com/chapters/panels/images/dockpanel_widths_heights.png "A DockPanel where width or heights has been specified for the child controls")
-
-+++
-
-The top and bottom controls now take precedence over the left and right controls, and they're all taking up 50 pixels in either height or width. If you make the window bigger or smaller, you will also see that this static width/height remains the same no matter what - only the center area increases or decreases in size as you resize the window.
-
-+++
-
-## LastChildFill
-
-As already mentioned, the default behavior is that the last child of the DockPanel takes up the rest of the space, but this can be disabled using the LastChildFill. Here's an example where we disable it, and at the same time we'll show the ability to dock more than one control to the same side:
-
-+++
-
-```XML
-<Window x:Class="WpfTutorialSamples.Panels.DockPanel"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="DockPanel" Height="300" Width="300">
-        <DockPanel LastChildFill="False">
-                <Button DockPanel.Dock="Top" Height="50">Top</Button>
-                <Button DockPanel.Dock="Bottom" Height="50">Bottom</Button>
-                <Button DockPanel.Dock="Left" Width="50">Left</Button>
-                <Button DockPanel.Dock="Left" Width="50">Left</Button>
-                <Button DockPanel.Dock="Right" Width="50">Right</Button>
-                <Button DockPanel.Dock="Right" Width="50">Right</Button>
-        </DockPanel>
-</Window>
-```
-
-+++
-
-![A DockPanel where the LastChildFill property has been disabled](http://www.wpf-tutorial.com/chapters/panels/images/dockpanel_last_child_fill_disabled.png "A DockPanel where the LastChildFill property has been disabled")
-
-In this example, we dock two controls to the left and two controls to the right, and at the same time, we turn off the LastChildFill property. This leaves us with empty space in the center, which may be preferable in some cases.
-
----
-
-# The Grid Control
-
-The Grid is probably the most complex of the panel types. A Grid can contain multiple rows and columns. You define a height for each of the rows and a width for each of the columns, in either an absolute amount of pixels, in a percentage of the available space or as auto, where the row or column will automatically adjust its size depending on the content. Use the Grid when the other panels doesn't do the job, e.g. when you need multiple columns and often in combination with the other panels.
-
-+++
-
-In its most basic form, the Grid will simply take all of the controls you put into it, stretch them to use the maximum available space and place it on top of each other:
+The above example was easy to fix, because it was clear to WPF what we were trying to do and why it didn't work. Consider this next example though:
 
 ```XML
 Download sample
-<Window x:Class="WpfTutorialSamples.Panels.Grid"
+<Window x:Class="WpfTutorialSamples.DataBinding.DataBindingDebuggingSample"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Grid" Height="300" Width="300">
-    <Grid>
-                <Button>Button 1</Button>
-                <Button>Button 2</Button>
+        Title="DataBindingDebuggingSample" Height="100" Width="200">
+    <Grid Margin="10">
+                <TextBlock Text="{Binding Title}" />
         </Grid>
 </Window>
 ```
 
 +++
 
-![A simple Grid](http://www.wpf-tutorial.com/chapters/panels/images/grid_simple.png "A simple Grid")
+I'm trying to bind to the property "Title", but on which object? As stated in the article on data contexts, WPF will use the DataContext property on the TextBlock here, which may be inherited down the control hierarchy, but in this example, I forgot to assign a data context. This basically means that I'm trying to get a property on a NULL object. WPF will gather that this might be a perfectly valid binding, but that the object just hasn't been initialized yet, and therefore it won't complain about it. If you run this example and look in the **Output** window, you won't see any binding errors.
 
 +++
 
-As you can see, the last control gets the top position, which in this case means that you can't even see the first button. Not terribly useful for most situations though, so let's try dividing the space, which is what the grid does so well. We do that by using ColumnDefinitions and RowDefinitions. In the first example, we'll stick to columns:
-
-+++
+However, for the cases where this is not the behavior that you're expecting, there is a way to force WPF into telling you about all the binding problems it runs into. It can be done by setting the TraceLevel on the PresentationTraceSources object, which can be found in the System.Diagnostics namespace:
 
 ```XML
-<Window x:Class="WpfTutorialSamples.Panels.Grid"
+<Window x:Class="WpfTutorialSamples.DataBinding.DataBindingDebuggingSample"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Grid" Height="300" Width="300">
-    <Grid>
-                <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Button>Button 1</Button>
-                <Button Grid.Column="1">Button 2</Button>
+        xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
+        Title="DataBindingDebuggingSample" Height="100" Width="200">
+    <Grid Margin="10">
+                <TextBlock Text="{Binding Title, diag:PresentationTraceSources.TraceLevel=High}" />
         </Grid>
 </Window>
 ```
 
 +++
 
-![A Grid divided into two columns](http://www.wpf-tutorial.com/chapters/panels/images/grid_two_columns.png "A Grid divided into two columns")
-
-+++
-
-In this example, we have simply divided the available space into two columns, which will share the space equally, using a "star width" (this will be explained later). On the second button, I use a so-called Attached property to place the button in the second column (0 is the first column, 1 is the second and so on). I could have used this property on the first button as well, but it automatically gets assigned to the first column and the first row, which is exactly what we want here.
-
-+++
-
-As you can see, the controls take up all the available space, which is the default behavior when the grid arranges its child controls. It does this by setting the HorizontalAlignment and VerticalAlignment on its child controls to Stretch.
-
-In some situations you may want them to only take up the space they need though and/or control how they are placed in the Grid. The easiest way to do this is to set the HorizontalAlignment and VerticalAlignment directly on the controls you wish to manipulate. Here's a modified version of the above example:
-
-+++
+Notice that I have added a reference to the System.Diagnostics namespace in the top, and then used the property on the binding. WPF will now give you loads of information about this specific binding in the **Output** window:
 
 ```XML
-<Window x:Class="WpfTutorialSamples.Panels.Grid"
+System.Windows.Data Warning: 55 : Created BindingExpression (hash=2902278) for Binding (hash=52760599)
+System.Windows.Data Warning: 57 :   Path: 'Title'
+System.Windows.Data Warning: 59 : BindingExpression (hash=2902278): Default mode resolved to OneWay
+System.Windows.Data Warning: 60 : BindingExpression (hash=2902278): Default update trigger resolved to PropertyChanged
+System.Windows.Data Warning: 61 : BindingExpression (hash=2902278): Attach to System.Windows.Controls.TextBlock.Text (hash=18876224)
+System.Windows.Data Warning: 66 : BindingExpression (hash=2902278): Resolving source
+System.Windows.Data Warning: 69 : BindingExpression (hash=2902278): Found data context element: TextBlock (hash=18876224) (OK)
+System.Windows.Data Warning: 70 : BindingExpression (hash=2902278): DataContext is null
+System.Windows.Data Warning: 64 : BindingExpression (hash=2902278): Resolve source deferred
+System.Windows.Data Warning: 66 : BindingExpression (hash=2902278): Resolving source
+System.Windows.Data Warning: 69 : BindingExpression (hash=2902278): Found data context element: TextBlock (hash=18876224) (OK)
+System.Windows.Data Warning: 70 : BindingExpression (hash=2902278): DataContext is null
+System.Windows.Data Warning: 66 : BindingExpression (hash=2902278): Resolving source
+System.Windows.Data Warning: 69 : BindingExpression (hash=2902278): Found data context element: TextBlock (hash=18876224) (OK)
+System.Windows.Data Warning: 70 : BindingExpression (hash=2902278): DataContext is null
+System.Windows.Data Warning: 66 : BindingExpression (hash=2902278): Resolving source
+System.Windows.Data Warning: 69 : BindingExpression (hash=2902278): Found data context element: TextBlock (hash=18876224) (OK)
+System.Windows.Data Warning: 70 : BindingExpression (hash=2902278): DataContext is null
+System.Windows.Data Warning: 66 : BindingExpression (hash=2902278): Resolving source  (last chance)
+System.Windows.Data Warning: 69 : BindingExpression (hash=2902278): Found data context element: TextBlock (hash=18876224) (OK)
+System.Windows.Data Warning: 77 : BindingExpression (hash=2902278): Activate with root item <null>
+System.Windows.Data Warning: 105 : BindingExpression (hash=2902278):   Item at level 0 is null - no accessor
+System.Windows.Data Warning: 79 : BindingExpression (hash=2902278): TransferValue - got raw value {DependencyProperty.UnsetValue}
+System.Windows.Data Warning: 87 : BindingExpression (hash=2902278): TransferValue - using fallback/default value ''
+System.Windows.Data Warning: 88 : BindingExpression (hash=2902278): TransferValue - using final value ''
+```
+
+By reading through the list, you can actually see the entire process that WPF goes through to try to find a proper value for your TextBlock control. Several times you will see it being unable to find a proper DataContext, and in the end, it uses the default _{DependencyProperty.UnsetValue}_ which translates into an empty string.
+
++++
+
+## Using the real debugger
+
+The above trick can be great for diagnosing a bad binding, but for some cases, it's easier and more pleasant to work with the real debugger. Bindings doesn't natively support this, since they are being handled deep inside of WPF, but using a Converter, like shown in a previous article, you can actually jump into this process and step through it. You don't really need a Converter that does anything useful, you just need a way into the binding process, and a dummy converter will get you there:
+
+```XML
+<Window x:Class="WpfTutorialSamples.DataBinding.DataBindingDebuggingSample"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Grid" Height="300" Width="300">
-    <Grid>
-                <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>               
-                <Button VerticalAlignment="Top" HorizontalAlignment="Center">Button 1</Button>
-                <Button Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right">Button 2</Button>
+        xmlns:self="clr-namespace:WpfTutorialSamples.DataBinding"
+        Title="DataBindingDebuggingSample" Name="wnd" Height="100" Width="200">
+        <Window.Resources>
+                <self:DebugDummyConverter x:Key="DebugDummyConverter" />
+        </Window.Resources>
+    <Grid Margin="10">
+                <TextBlock Text="{Binding Title, ElementName=wnd, Converter={StaticResource DebugDummyConverter}}" />
         </Grid>
 </Window>
 ```
 
 +++
 
-![A Grid divided into two columns with custom alignment on the child controls](http://www.wpf-tutorial.com/chapters/panels/images/grid_two_columns_alignment.png "A Grid divided into two columns with custom alignment on the child controls")
+```C#
+using System;
+using System.Windows;
+using System.Windows.Data;
+using System.Diagnostics;
 
-As you can see from the resulting screenshot, the first button is now placed in the top and centered. The second button is placed in the middle, aligned to the right.
+namespace WpfTutorialSamples.DataBinding
+{
+        public partial class DataBindingDebuggingSample : Window
+        {
+                public DataBindingDebuggingSample()
+                {
+                        InitializeComponent();
+                }
+        }
 
----
+        public class DebugDummyConverter : IValueConverter
+        {
+                public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+                {
+                        Debugger.Break();
+                        return value;
+                }
 
-# The Grid - Rows & columns
-
-In the last chapter, we introduced you to the great Grid panel and showed you a couple of basic examples on how to use it. In this chapter we will do some more advanced layouts, as this is where the Grid really shines. First of all, let's throw in more columns and even some rows, for a true tabular layout:
-
-+++
-
-```XML
-<Window x:Class="WpfTutorialSamples.Panels.TabularGrid"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="TabularGrid" Height="300" Width="300">
-    <Grid>
-                <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="1*" />
-                        <ColumnDefinition Width="1*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                        <RowDefinition Height="2*" />
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="1*" />
-                </Grid.RowDefinitions>
-                <Button>Button 1</Button>
-                <Button Grid.Column="1">Button 2</Button>
-                <Button Grid.Column="2">Button 3</Button>
-                <Button Grid.Row="1">Button 4</Button>
-                <Button Grid.Column="1" Grid.Row="1">Button 5</Button>
-                <Button Grid.Column="2" Grid.Row="1">Button 6</Button>
-                <Button Grid.Row="2">Button 7</Button>
-                <Button Grid.Column="1" Grid.Row="2">Button 8</Button>
-                <Button Grid.Column="2" Grid.Row="2">Button 9</Button>
-        </Grid>
-</Window>
+                public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+                {
+                        Debugger.Break();
+                        return value;
+                }
+        }
+}
 ```
 
 +++
 
-![A Grid with several columns and rows, creating a tabular layout](http://www.wpf-tutorial.com/chapters/panels/images/grid_tabular.png "A Grid with several columns and rows, creating a tabular layout")
+In the Code-behind file, we define a DebugDummyConverter. In the Convert() and ConvertBack() methods, we call Debugger.Break(), which has the same effect as setting a breakpoint in Visual Studio, and then return the value that was given to us untouched.
 
-A total of nine buttons, each placed in their own cell in a grid containing three rows and three columns. 
-
-+++
-
-We once again use a star based width, but this time we assign a number as well - the first row and the first column has a width of 2*, which basically means that it uses twice the amount of space as the rows and columns with a width of 1* (or just * - that's the same).
+In the markup, we add a reference to our converter in the window resources and then we use it in our binding. In a real world application, you should define the converter in a file of its own and then add the reference to it in App.xaml, so that you may use it all over the application without having to create a new reference to it in each window, but for this example, the above should do just fine.
 
 +++
 
-You will also notice that I use the Attached properties Grid.Row and Grid.Column to place the controls in the grid, and once again you will notice that I have omitted these properties on the controls where I want to use either the first row or the first column (or both). This is essentially the same as specifying a zero. This saves a bit of typing, but you might prefer to assign them anyway for a better overview - that's totally up to you!
+If you run the example, you will see that the debugger breaks as soon as WPF tries to fetch the value for the title of the window. You can now inspect the values given to the Convert() method, or even change them before proceeding, using the standard debugging capabilities of Visual Studio.
 
----
-
-# The Grid - Units
-
-So far we have mostly used the star width/height, which specifies that a row or a column should take up a certain percentage of the combined space. However, there are two other ways of specifying the width or height of a column or a row: Absolute units and the Auto width/height. Let's try creating a Grid where we mix these:
-
-+++
-
-```XML
-<Window x:Class="WpfTutorialSamples.Panels.GridUnits"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="GridUnits" Height="200" Width="400">
-        <Grid>
-                <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="100" />
-                </Grid.ColumnDefinitions>
-                <Button>Button 1</Button>
-                <Button Grid.Column="1">Button 2 with long text</Button>
-                <Button Grid.Column="2">Button 3</Button>
-        </Grid>
-</Window>
-```
-
-+++
-
-![A Grid with columns of varying widths](http://www.wpf-tutorial.com/chapters/panels/images/grid_units_simple.png "A Grid with columns of varying widths")
-
-In this example, the first button has a star width, the second one has its width set to Auto and the last one has a static width of 100 pixels.
-
-+++
-
-The result can be seen on the screenshot, where the second button only takes exactly the amount of space it needs to render its longer text, the third button takes exactly the 100 pixels it was promised and the first button, with the variable width, takes the rest.
-
-+++
-
-In a Grid where one or several columns (or rows) have a variable (star) width, they automatically get to share the width/height not already used by the columns/rows which uses an absolute or Auto width/height. This becomes more obvious when we resize the window:
-
-+++
-
-![A Grid with columns of varying widths, resized to a smaller size](http://www.wpf-tutorial.com/chapters/panels/images/grid_units_small.png "A Grid with columns of varying widths, resized to a smaller size") 
-
-+++
-
-![A Grid with columns of varying widths, resized to a larger size](http://www.wpf-tutorial.com/chapters/panels/images/grid_units_large.png "A Grid with columns of varying widths, resized to a larger size")
-
-+++
-
-On the first screenshot, you will see that the Grid reserves the space for the last two buttons, even though it means that the first one doesn't get all the space it needs to render properly. On the second screenshot, you will see the last two buttons keeping the exact same amount of space, leaving the surplus space to the first button.
-
-+++
-
-This can be a very useful technique when designing a wide range of dialogs. For instance, consider a simple contact form where the user enters a name, an e-mail address and a comment. The first two fields will usually have a fixed height, while the last one might as well take up as much space as possible, leaving room to type a longer comment. In the next chapter, we will try building a contact form, using the grid and rows and columns of different heights and widths.
-
----
-
-# The Grid - Spanning
-
-The default Grid behavior is that each control takes up one cell, but sometimes you want a certain control to take up more rows or columns. Fortunately the Grid makes this very easy, with the Attached properties ColumnSpan and RowSpan. The default value for this property is obviously 1, but you can specify a bigger number to make the control span more rows or columns.
-
-+++
-
-Here's a very simple example, where we use the ColumnSpan property:
-
-```XML
-<Window x:Class="WpfTutorialSamples.Panels.GridColRowSpan"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="GridColRowSpan" Height="110" Width="300">
-        <Grid>
-                <Grid.ColumnDefinitions>                        
-                        <ColumnDefinition Width="1*" />
-                        <ColumnDefinition Width="1*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Button>Button 1</Button>
-                <Button Grid.Column="1">Button 2</Button>
-                <Button Grid.Row="1" Grid.ColumnSpan="2">Button 3</Button>
-        </Grid>
-</Window>
-```
-
-+++
-
-![A Grid with column spanning applied to one of the controls](http://www.wpf-tutorial.com/chapters/panels/images/grid_col_span.png "A Grid with column spanning applied to one of the controls")
-
-+++
-
-We just define two columns and two rows, all of them taking up their equal share of the place. The first two buttons just use the columns normally, but with the third button, we make it take up two columns of space on the second row, using the ColumnSpan attribute.
-
-This is all so simple that we could have just used a combination of panels to achieve the same effect, but for just slightly more advanced cases, this is really useful. Let's try something which better shows how powerful this is:
-
-+++
-
-```XML
-Download sample
-<Window x:Class="WpfTutorialSamples.Panels.GridColRowSpanAdvanced"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="GridColRowSpanAdvanced" Height="300" Width="300">
-    <Grid>
-                <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Button Grid.ColumnSpan="2">Button 1</Button>
-                <Button Grid.Column="3">Button 2</Button>
-                <Button Grid.Row="1">Button 3</Button>
-                <Button Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" Grid.ColumnSpan="2">Button 4</Button>
-                <Button Grid.Column="0" Grid.Row="2">Button 5</Button>
-        </Grid>
-</Window>
-```
-
-+++
-
-![A Grid with both column and row spanning applied to several child controls](http://www.wpf-tutorial.com/chapters/panels/images/grid_col_row_span.png "A Grid with both column and row spanning applied to several child controls")
-
-+++
-
-With three columns and three rows we would normally have nine cells, but in this example, we use a combination of row and column spanning to fill all the available space with just five buttons. As you can see, a control can span either extra columns, extra rows or in the case of button 4: both.
-
-So as you can see, spanning multiple columns and/or rows in a Grid is very easy. In a later article, we will use the spanning, along with all the other Grid techniques in a more practical example.
-
----
-
-
-# The GridSplitter
-
-As you saw in the previous articles, the Grid panel makes it very easy to divide up the available space into individual cells. Using column and row definitions, you can easily decide how much space each row or column should take up, but what if you want to allow the user to change this? This is where the GridSplitter control comes into play.
-
-+++
-
-The GridSplitter is used simply by adding it to a column or a row in a Grid, with the proper amount of space for it, e.g. 5 pixels. It will then allow the user to drag it from side to side or up and down, while changing the size of the column or row on each of the sides of it. Here's an example:
-
-+++
-
-```XML
-<Window x:Class="WpfTutorialSamples.Panels.GridSplitterSample"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="GridSplitterSample" Height="300" Width="300">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="5" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <TextBlock FontSize="55" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap">Left side</TextBlock>
-        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
-        <TextBlock Grid.Column="2" FontSize="55" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap">Right side</TextBlock>
-    </Grid>
-</Window>
-```
-
-+++
-
-![A Grid panel with a GridSplitter control](http://www.wpf-tutorial.com/chapters/panels/images/grid_splitter_vertical_centered.png "A Grid panel with a GridSplitter control")
-
-+++
-
-![A Grid panel with a GridSplitter control in action](http://www.wpf-tutorial.com/chapters/panels/images/grid_splitter_vertical_not_centered.png "A Grid panel with a GridSplitter control in action")
-
-+++
-
-As you can see, I've simply created a Grid with two equally wide columns, with a 5 pixel column in the middle. Each of the sides are just a TextBlock control to illustrate the point. As you can see from the screenshots, the GridSplitter is rendered as a dividing line between the two columns and as soon as the mouse is over it, the cursor is changed to reflect that it can be resized.
-
-+++
-
-## Horizontal GridSplitter
-
-The GridSplitter is very easy to use and of course it supports horizontal splits as well. In fact, you hardly have to change anything to make it work horizontally instead of vertically, as the next example will show:
-
-+++
-
-```XML
-<Window x:Class="WpfTutorialSamples.Panels.GridSplitterHorizontalSample"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="GridSplitterHorizontalSample" Height="300" Width="300">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="5" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <TextBlock FontSize="55" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap">Top</TextBlock>
-        <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" />
-        <TextBlock Grid.Row="2" FontSize="55" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap">Bottom</TextBlock>
-    </Grid>
-</Window>
-```
-
-+++
-
-![A horizontal Grid panel with a GridSplitter control in action](http://www.wpf-tutorial.com/chapters/panels/images/grid_splitter_horizontal_not_centered.png "A horizontal Grid panel with a GridSplitter control in action")
-
-As you can see, I simply changed the columns into rows and on the GridSplitter, I defined a Height instead of a Width. The GridSplitter figures out the rest on its own, but in case it doesn't, you can use the **ResizeDirection** property on it to force it into either Rows or Columns mode.
-
----
-
-# Using the Grid: A contact form
-
-In the last couple of chapters we went through a lot of theoretic information, each with some very theoretic examples. In this chapter we will combine what we have learned about the Grid so far, into an example that can be used in the real world: A simple contact form.
-
-+++
-
-The good thing about the contact form is that it's just an example of a commonly used dialog - you can take the techniques used and apply them to almost any type of dialog that you need to create.
-
-The first take on this task is very simple and will show you a very basic contact form. It uses three rows, two of them with Auto heights and the last one with star height, so it consumes the rest of the available space:
-
-+++
-
-```XML
-<Window x:Class="WpfTutorialSamples.Panels.GridContactForm"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="GridContactForm" Height="300" Width="300">
-    <Grid>
-                <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                </Grid.RowDefinitions>          
-                <TextBox>Name</TextBox>
-                <TextBox Grid.Row="1">E-mail</TextBox>
-                <TextBox Grid.Row="2" AcceptsReturn="True">Comment</TextBox>            
-        </Grid>
-</Window>
-```
-
-+++
-
-![A simple contact form using the Grid](http://www.wpf-tutorial.com/chapters/panels/images/grid_contact_form_simple.png "A simple contact form using the Grid")
-
-As you can see, the last TextBox simply takes up the remaining space, while the first two only takes up the space they require. Try resizing the window and you will see the comment TextBox resize with it.
-
-+++
-
-In this very simple example, there are no labels to designate what each of the fields are for. Instead, the explanatory text is inside the TextBox, but this is not generally how a Windows dialog looks. Let's try improving the look and usability a bit:
-
-+++
-
-```XML
-<Window x:Class="WpfTutorialSamples.Panels.GridContactFormTake2"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="GridContactFormTake2" Height="300" Width="300">
-        <Grid Margin="10">
-                <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Label>Name: </Label>
-                <TextBox Grid.Column="1" Margin="0,0,0,10" />
-                <Label Grid.Row="1">E-mail: </Label>
-                <TextBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,10" />
-                <Label Grid.Row="2">Comment: </Label>
-                <TextBox Grid.Row="2" Grid.Column="1" AcceptsReturn="True" />
-        </Grid>
-</Window>
-```
-
-+++
-
-![A simple contact form using the Grid - take two](http://www.wpf-tutorial.com/chapters/panels/images/grid_contact_form_take2.png "A simple contact form using the Grid - take two")
-
-+++
-
-But perhaps you're in a situation where the comment field is pretty self-explanatory? In that case, let's skip the label and use ColumnSpan to get even more space for the comment TextBox:
-
-```XML
-<TextBox Grid.ColumnSpan="2" Grid.Row="2" AcceptsReturn="True" />
-```
-
-+++
-
-![A simple contact form using the Grid - take three](http://www.wpf-tutorial.com/chapters/panels/images/grid_contact_form_take3.png "A simple contact form using the Grid - take three")
-
-So as you can see, the Grid is a very powerful panel. Hopefully you can use all of these techniques when designing your own dialogs.
+If the debugger never breaks, it means that the converter is not used. This usually indicates that you have an invalid binding expression, which can be diagnosed and fixed using the methods described in the start of this article. The dummy-converter trick is only for testing valid binding expressions.
