@@ -1,353 +1,119 @@
-# The ItemsControl
+# Introduction to the ListView control
 
-WPF has a wide range of controls for displaying a list of data. They come in several shapes and forms and vary in how complex they are and how much work they perform for you. The simplest variant is the ItemsControl, which is pretty much just a markup-based loop - you need to apply all the styling and templating, but in many cases, that's just what you need.
-
-+++
-
-## A simple ItemsControl example
-
-Let's kick off with a very simple example, where we hand-feed the ItemsControl with a set of items. This should show you just how simple the ItemsControl is:
+The ListView control is very commonly used in Windows applications, to represent lists of data. A great example of this is the file lists in Windows Explorer, where each file can be shown by its name and, if desired, with columns containing information about the size, last modification date and so on.
 
 +++
 
-```XML
-<Window x:Class="WpfTutorialSamples.ItemsControl.ItemsControlSample"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                xmlns:system="clr-namespace:System;assembly=mscorlib"
-        Title="ItemsControlSample" Height="150" Width="200">
-    <Grid Margin="10">
-                <ItemsControl>
-                        <system:String>ItemsControl Item #1</system:String>
-                        <system:String>ItemsControl Item #2</system:String>
-                        <system:String>ItemsControl Item #3</system:String>
-                        <system:String>ItemsControl Item #4</system:String>
-                        <system:String>ItemsControl Item #5</system:String>
-                </ItemsControl>
-        </Grid>
-</Window>
-```
+## ListView in WPF vs. WinForms
+
+If you have previously worked with WinForms, then you have a good idea about how practical the ListView is, but you should be aware that the ListView in WPF isn't used like the WinForms version. Once again the main difference is that while the WinForms ListView simply calls Windows API functions to render a common Windows ListView control, the WPF ListView is an independent control that doesn't rely on the Windows API.
 
 +++
 
-![A simple ItemsControl with items defined in the markup](http://www.wpf-tutorial.com/chapters/list-controls/images/itemscontrol_simple.png "A simple ItemsControl with items defined in the markup")
-
-+++
-
-As you can see, there is nothing that shows that we're using a control for repeating the items instead of just manually adding e.g. 5 TextBlock controls - the ItemsControl is completely lookless by default. If you click on one of the items, nothing happens, because there's no concept of selected item(s) or anything like that.
-
-+++
-
-## ItemsControl with data binding
-
-Of course the ItemsControl is not meant to be used with items defined in the markup, like we did in the first example. Like pretty much any other control in WPF, the ItemsControl is made for data binding, where we use a template to define how our code-behind classes should be presented to the user.
-
-+++
-
-To demonstrate that, I've whipped up an example where we display a TODO list to the user, and to show you just how flexible everything gets once you define your own templates, I've used a ProgressBar control to show you the current completion percentage. First some code, then a screenshot and then an explanation of it all:
-
-+++
-
-
-```XML
-<Window x:Class="WpfTutorialSamples.ItemsControl.ItemsControlDataBindingSample"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ItemsControlDataBindingSample" Height="150" Width="300">
-    <Grid Margin="10">
-                <ItemsControl Name="icTodoList">
-                        <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                        <Grid Margin="0,0,0,5">
-                                                <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="100" />
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Text="{Binding Title}" />
-                                                <ProgressBar Grid.Column="1" Minimum="0" Maximum="100" Value="{Binding Completion}" />
-                                        </Grid>
-                                </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                </ItemsControl>
-        </Grid>
-</Window>
-```
-
-+++
-
-```C#
-using System;
-using System.Windows;
-using System.Collections.Generic;
-
-namespace WpfTutorialSamples.ItemsControl
-{
-        public partial class ItemsControlDataBindingSample : Window
-        {
-                public ItemsControlDataBindingSample()
-                {
-                        InitializeComponent();
-
-                        List<TodoItem> items = new List<TodoItem>();
-                        items.Add(new TodoItem() { Title = "Complete this WPF tutorial", Completion = 45 });
-                        items.Add(new TodoItem() { Title = "Learn C#", Completion = 80 });
-                        items.Add(new TodoItem() { Title = "Wash the car", Completion = 0 });
-
-                        icTodoList.ItemsSource = items;
-                }
-        }
-
-        public class TodoItem
-        {
-                public string Title { get; set; }
-                public int Completion { get; set; }
-        }
-}
-```
-
-+++
-
-![An ItemsControl using data binding](http://www.wpf-tutorial.com/chapters/list-controls/images/itemscontrol_data_binding.png "An ItemsControl using data binding")
-
-+++
-
-The most important part of this example is the template that we specify inside of the ItemsControl, using a DataTemplate tag inside of the ItemsControl.ItemTemplate. We add a Grid panel, to get two columns: In the first we have a TextBlock, which will show the title of the TODO item, and in the second column we have a ProgressBar control, which value we bind to the Completion property.
-
-+++
-
-The template now represents a TodoItem, which we declare in the Code-behind file, where we also instantiate a number of them and add them to a list. In the end, this list is assigned to the **ItemsSource** property of our ItemsControl, which then does the rest of the job for us. Each item in the list is displayed by using our template, as you can see from the resulting screenshot.
-
-+++
-
-## The ItemsPanelTemplate property
-
-In the above examples, all items are rendered from top to bottom, with each item taking up the full row. This happens because the ItemsControl throw all of our items into a vertically aligned StackPanel by default. It's very easy to change though, since the ItemsControl allows you to change which panel type is used to hold all the items. Here's an example:
-
-+++
-
-```XML
-<Window x:Class="WpfTutorialSamples.ItemsControl.ItemsControlPanelSample"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                xmlns:system="clr-namespace:System;assembly=mscorlib"
-        Title="ItemsControlPanelSample" Height="150" Width="250">
-        <Grid Margin="10">
-                <ItemsControl>
-                        <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                        <WrapPanel />
-                                </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                        <Button Content="{Binding}" Margin="0,0,5,5" />
-                                </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                        <system:String>Item #1</system:String>
-                        <system:String>Item #2</system:String>
-                        <system:String>Item #3</system:String>
-                        <system:String>Item #4</system:String>
-                        <system:String>Item #5</system:String>
-                </ItemsControl>
-        </Grid>
-</Window>
-```
-
-+++
-
-![An ItemsControl using a WrapPanel for holding the items](http://www.wpf-tutorial.com/chapters/list-controls/images/itemscontrol_wrappanel.png "An ItemsControl using a WrapPanel for holding the items")
-
-+++
-
-We specify that the ItemsControl should use a WrapPanel as its template by declaring one in the **ItemsPanelTemplate** property and just for fun, we throw in an ItemTemplate that causes the strings to be rendered as buttons. You can use any of the WPF panels, but some are more useful than others.
-
-+++
-
-Another good example is the UniformGrid panel, where we can define a number of columns and then have our items neatly shown in equally-wide columns:
-
-```XML
-<Window x:Class="WpfTutorialSamples.ItemsControl.ItemsControlPanelSample"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                xmlns:system="clr-namespace:System;assembly=mscorlib"
-        Title="ItemsControlPanelSample" Height="150" Width="250">
-        <Grid Margin="10">
-                <ItemsControl>
-                        <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                        <UniformGrid Columns="2" />
-                                </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                        <Button Content="{Binding}" Margin="0,0,5,5" />
-                                </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                        <system:String>Item #1</system:String>
-                        <system:String>Item #2</system:String>
-                        <system:String>Item #3</system:String>
-                        <system:String>Item #4</system:String>
-                        <system:String>Item #5</system:String>
-                </ItemsControl>
-        </Grid>
-</Window>
-```
-
-+++
-
-![An ItemsControl using a UniformGrid panel for holding the items](http://www.wpf-tutorial.com/chapters/list-controls/images/itemscontrol_wrappanel.png "An ItemsControl using a UniformGrid panel for holding the items")
-
-+++
-
-## ItemsControl with scrollbars
-
-Once you start using the ItemsControl, you might run into a very common problem: By default, the ItemsControl doesn't have any scrollbars, which means that if the content doesn't fit, it's just clipped. This can be seen by taking our first example from this article and resizing the window:
-
-+++
-
-![An ItemsControl without scrollbars](http://www.wpf-tutorial.com/chapters/list-controls/images/itemscontrol_clipped.png "An ItemsControl without scrollbars")
-
-+++
-
-WPF makes this very easy to solve though. There are a number of possible solutions, for instance you can alter the template used by the ItemsControl to include a ScrollViewer control, but the easiest solution is to simply throw a ScrollViewer around the ItemsControl. Here's an example:
-
-+++
-
-```XML
-<Window x:Class="WpfTutorialSamples.ItemsControl.ItemsControlSample"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                xmlns:system="clr-namespace:System;assembly=mscorlib"
-        Title="ItemsControlSample" Height="150" Width="200">
-        <Grid Margin="10">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                        <ItemsControl>
-                                <system:String>ItemsControl Item #1</system:String>
-                                <system:String>ItemsControl Item #2</system:String>
-                                <system:String>ItemsControl Item #3</system:String>
-                                <system:String>ItemsControl Item #4</system:String>
-                                <system:String>ItemsControl Item #5</system:String>
-                        </ItemsControl>
-                </ScrollViewer>
-        </Grid>
-</Window>
-```
-
-+++
-
-![An ItemsControl without scrollbars](http://www.wpf-tutorial.com/chapters/list-controls/images/itemscontrol_scrollviewer.png"An ItemsControl without scrollbars")
-
-I set the two visibility options to Auto, to make them only visible when needed. As you can see from the screenshot, you can now scroll through the list of items.
+The WPF ListView does use a ListViewItem class for its most basic items, but if you compare it to the WinForms version, you might start looking for properties like ImageIndex, Group and SubItems, but they're not there. The WPF ListView handles stuff like item images, groups and their sub items in a completely different way.
 
 +++
 
 ## Summary
 
-The ItemsControl is great when you want full control of how your data is displayed, and when you don't need any of your content to be selectable. If you want the user to be able to select items from the list, then you're better off with one of the other controls, e.g. the ListBox or the ListView. They will be described in upcoming chapters.
+The ListView is a complex control, with lots of possibilities and especially in the WPF version, you get to customize it almost endlessly if you want to. For that reason, we have dedicated an entire category to all the ListView articles here on the site. Click on to the next article to get started.
 
 ---
 
-# The ListBox control
+# A simple ListView example
 
-In the last article, we had a look at the ItemsControl, which is probably the simplest list in WPF. The ListBox control is the next control in line, which adds a bit more functionality. One of the main differences is the fact that the ListBox control actually deals with selections, allowing the end-user to select one or several items from the list and automatically giving visual feedback for it.
+The WPF ListView control is very bare minimum in its most simple form. In fact, it will look a whole lot like the WPF ListBox, until you start adding specialized views to it. That's not so strange, since a ListView inherits directly from the ListBox control. So, a default ListView is actually just a ListBox, with a different selection mode (more on that later).
 
 +++
 
-Here's an example of a very simple ListBox control:
+Let's try creating a ListView in its most simple form:
 
 ```XML
-<Window x:Class="WpfTutorialSamples.ListBox_control.ListBoxSample"
+<Window x:Class="WpfTutorialSamples.ListView_control.ListViewBasicSample"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ListBoxSample" Height="120" Width="200">
-    <Grid Margin="10">
-                <ListBox>
-                        <ListBoxItem>ListBox Item #1</ListBoxItem>
-                        <ListBoxItem>ListBox Item #2</ListBoxItem>
-                        <ListBoxItem>ListBox Item #3</ListBoxItem>
-                </ListBox>
+        Title="ListViewBasicSample" Height="200" Width="200">
+    <Grid>
+                <ListView Margin="10">
+                        <ListViewItem>A ListView</ListViewItem>
+                        <ListViewItem IsSelected="True">with several</ListViewItem>
+                        <ListViewItem>items</ListViewItem>
+                </ListView>
         </Grid>
 </Window>
 ```
 
 +++
 
-![A simple ListBox control with items defined in the markup](http://www.wpf-tutorial.com/chapters/list-controls/images/listbox_simple.png "A simple ListBox control with items defined in the markup")
+![A simple ListView control](http://www.wpf-tutorial.com/chapters/listview/images/listview_simple.png "A simple ListView control")
 
-This is as simple as it gets: We declare a ListBox control, and inside of it, we declare three ListBoxItem's, each with its own text. However, since the ListBoxItem is actually a ContentControl, we can define custom content for it:
+This is pretty much as simple as it gets, using manually specified ListViewItem to fill the list and with nothing but a text label representing each item - a bare minimum WPF ListView control.
+
++++
+
+## ListViewItem with an image
+
+Because of the look-less nature of WPF, specifying an image for a ListViewItem isn't just about assigning an image ID or key to a property. Instead, you take full control of it and specify the controls needed to render both image and text in the ListViewItem. Here's an example:
 
 +++
 
 ```XML
-<Window x:Class="WpfTutorialSamples.ListBox_control.ListBoxSample"
+<Window x:Class="WpfTutorialSamples.ListView_control.ListViewBasicSample"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ListBoxSample" Height="120" Width="200">
-        <Grid Margin="10">
-                <ListBox>
-                        <ListBoxItem>
+        Title="ListViewBasicSample" Height="200" Width="200">
+    <Grid>
+                <ListView Margin="10">
+                        <ListViewItem>
                                 <StackPanel Orientation="Horizontal">
-                                        <Image Source="/WpfTutorialSamples;component/Images/bullet_blue.png" />
-                                        <TextBlock>ListBox Item #1</TextBlock>
+                                        <Image Source="/WpfTutorialSamples;component/Images/bullet_green.png" Margin="0,0,5,0" />
+                                        <TextBlock>Green</TextBlock>
                                 </StackPanel>
-                        </ListBoxItem>
-                        <ListBoxItem>
+                        </ListViewItem>
+                        <ListViewItem>
                                 <StackPanel Orientation="Horizontal">
-                                        <Image Source="/WpfTutorialSamples;component/Images/bullet_green.png" />
-                                        <TextBlock>ListBox Item #2</TextBlock>
+                                        <Image Source="/WpfTutorialSamples;component/Images/bullet_blue.png" Margin="0,0,5,0" />
+                                        <TextBlock>Blue</TextBlock>
                                 </StackPanel>
-                        </ListBoxItem>
-                        <ListBoxItem>
+                        </ListViewItem>
+                        <ListViewItem IsSelected="True">
                                 <StackPanel Orientation="Horizontal">
-                                        <Image Source="/WpfTutorialSamples;component/Images/bullet_red.png" />
-                                        <TextBlock>ListBox Item #3</TextBlock>
+                                        <Image Source="/WpfTutorialSamples;component/Images/bullet_red.png" Margin="0,0,5,0" />
+                                        <TextBlock>Red</TextBlock>
                                 </StackPanel>
-                        </ListBoxItem>
-                </ListBox>
+                        </ListViewItem>
+                </ListView>
         </Grid>
 </Window>
 ```
 
 +++
 
-![A ListBox control with custom content](http://www.wpf-tutorial.com/chapters/list-controls/images/listbox_custom_content.png "A ListBox control with custom content")
+![A simple ListView control with images assigned to each item](http://www.wpf-tutorial.com/chapters/listview/images/listview_simple_images.png "A simple ListView control with images assigned to each item")
+
+What we do here is very simple. Because the ListViewItem derives from the ContentControl class, we can specify a WPF control as its content. In this case, we use a StackPanel, which has an Image and a TextBlock as its child controls.
 
 +++
 
-For each of the ListBoxItem's we now add a StackPanel, in which we add an Image and a TextBlock. This gives us full control of the content as well as the text rendering, as you can see from the screenshot, where different colors have been used for each of the numbers.
+## Summary
 
-From the screenshot you might also notice another difference when comparing the ItemsControl to the ListBox: By default, a border is shown around the control, making it look like an actual control instead of just output.
+As you can see, building a ListView manually in XAML is very simple, but in most cases, your ListView data will come from some sort of data source, which should be rendered in the ListView at runtime. We will look into doing just that in the next chapter.
+
+---
+
+# ListView, data binding and ItemTemplate
+
+In the previous article, we manually populated a ListView control through XAML code, but in WPF, it's all about data binding. The concept of data binding is explained in detail in another part of this tutorial, but generally speaking it's about separating data from layout. So, let's try binding some data to a ListView:
 
 +++
-
-## Data binding the ListBox
-
-Manually defining items for the ListBox makes for a fine first example, but most of the times, your ListBox controls will be filled with items from a data source using data binding. By default, if you bind a list of items to the ListBox, their ToString() method will be used to represent each item. This is rarely what you want, but fortunately, we can easily declare a template that will be used to render each item.
-
-+++
-
-I have re-used the TODO based example from the ItemsControl article, where we build a cool TODO list using a simple Code-behind class and, in this case, a ListBox control for the visual representation. Here's the example:
 
 ```XML
-<Window x:Class="WpfTutorialSamples.ListBox_control.ListBoxDataBindingSample"
+<Window x:Class="WpfTutorialSamples.ListView_control.ListViewDataBindingSample"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ListBoxDataBindingSample" Height="150" Width="300">
-    <Grid Margin="10">
-                <ListBox Name="lbTodoList" HorizontalContentAlignment="Stretch">
-                        <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                        <Grid Margin="0,2">
-                                                <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="100" />
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Text="{Binding Title}" />
-                                                <ProgressBar Grid.Column="1" Minimum="0" Maximum="100" Value="{Binding Completion}" />
-                                        </Grid>
-                                </DataTemplate>
-                        </ListBox.ItemTemplate>
-                </ListBox>
+        Title="ListViewDataBindingSample" Height="300" Width="300">
+    <Grid>
+                <ListView Margin="10" Name="lvDataBinding"></ListView>
         </Grid>
 </Window>
 ```
@@ -356,97 +122,410 @@ I have re-used the TODO based example from the ItemsControl article, where we bu
 
 ```C#
 using System;
-using System.Windows;
 using System.Collections.Generic;
+using System.Windows;
 
-namespace WpfTutorialSamples.ListBox_control
+namespace WpfTutorialSamples.ListView_control
 {
-        public partial class ListBoxDataBindingSample : Window
+        public partial class ListViewDataBindingSample : Window
         {
-                public ListBoxDataBindingSample()
+                public ListViewDataBindingSample()
                 {
                         InitializeComponent();
-                        List<TodoItem> items = new List<TodoItem>();
-                        items.Add(new TodoItem() { Title = "Complete this WPF tutorial", Completion = 45 });
-                        items.Add(new TodoItem() { Title = "Learn C#", Completion = 80 });
-                        items.Add(new TodoItem() { Title = "Wash the car", Completion = 0 });
-
-                        lbTodoList.ItemsSource = items;
+                        List<User> items = new List<User>();
+                        items.Add(new User() { Name = "John Doe", Age = 42 });
+                        items.Add(new User() { Name = "Jane Doe", Age = 39 });
+                        items.Add(new User() { Name = "Sammy Doe", Age = 13 });
+                        lvDataBinding.ItemsSource = items;
                 }
         }
 
-        public class TodoItem
+        public class User
         {
-                public string Title { get; set; }
-                public int Completion { get; set; }
+                public string Name { get; set; }
+
+                public int Age { get; set; }
         }
 }
 ```
 
 +++
 
-![A ListBox control using data binding](http://www.wpf-tutorial.com/chapters/list-controls/images/listbox_databinding.png "A ListBox control using data binding")
+We populate a list of our own User objects, each user having a name and an age. The data binding process happens automatically as soon as we assign the list to the ItemsSource property of the ListView, but the result is a bit discouraging:
 
 +++
 
-All the magic happens in the ItemTemplate that we have defined for the ListBox. In there, we specify that each ListBox item should consist of a Grid, divided into two columns, with a TextBlock showing the title in the first and a ProgressBar showing the completion status in the second column. To get the values out, we use some very simple data binding, which is all explained in the data binding part of this tutorial.
+![A simple ListView control, using data binding](http://www.wpf-tutorial.com/chapters/listview/images/listview_databinding_simple.png "A simple ListView control, using data binding")
 
 +++
 
-In the Code-behind file, we have declared a very simple TodoItem class to hold each of our TODO items. In the constructor of the window, we initialize a list, add three TODO items to it and then assign it to the ItemsSource of the ListBox. The combination of the ItemsSource and the ItemTemplate we specified in the XAML part, this is all WPF need to render all of the items as a TODO list.
+Each user is represented by their type name in the ListView. This is to be expected, because .NET doesn't have a clue about how you want your data to be displayed, so it just calls the ToString() method on each object and uses that to represent the item.
 
 +++
 
-Please notice the **HorizontalContentAlignment** property that I set to **Stretch** on the ListBox. The default content alignment for a ListBox item is **Left**, which means that each item only takes up as much horizontal space as it needs. The result? Well, not quite what we want:
+We can use that to our advantage and override the ToString() method, to get a more meaningful output. Try replacing the User class with this version:
+
+```XML
+public class User
+{
+        public string Name { get; set; }
+
+        public int Age { get; set; }
+
+        public override string ToString()
+        {
+                return this.Name + ", " + this.Age + " years old";
+        }
+}
+```
 
 +++
 
-![A ListBox control where the HorizontalContentAlignment property has not been changed](http://www.wpf-tutorial.com/chapters/list-controls/images/listbox_content_alignment_bad.png "A ListBox control where the HorizontalContentAlignment property has not been changed")
-
-By using the Stretch alignment, each item is stretched to take up the full amount of available space, as you can see from the previous screenshot.
+![A simple ListView control, using data binding and a ToString method on the source object](http://www.wpf-tutorial.com/chapters/listview/images/listview_databinding_tostring.png "A simple ListView control, using data binding and a ToString method on the source object")
 
 +++
 
-## Working with ListBox selection
+This is a much more user friendly display and will do just fine in some cases, but relying on a simple string is not that flexible. Perhaps you want a part of the text to be bold or another color? Perhaps you want an image? Fortunately, WPF makes all of this very simple using templates.
 
-As mentioned, a key difference between the ItemsControl and the ListBox is that the ListBox handles and displays user selection for you. Therefore, a lot of ListBox question revolves around somehow working with the selection. To help with some of these questions, I have created a bigger example, showing you some selection related tricks:
++++
+
+## ListView with an ItemTemplate
+
+WPF is all about templating, so specifying a data template for the ListView is very easy. In this example, we'll do a bunch of custom formatting in each item, just to show you how flexible this makes the WPF ListView.
 
 +++
 
 ```XML
-<Window x:Class="WpfTutorialSamples.ListBox_control.ListBoxSelectionSample"
+<Window x:Class="WpfTutorialSamples.ListView_control.ListViewItemTemplateSample"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ListBoxSelectionSample" Height="250" Width="450">
-        <DockPanel Margin="10">
-                <StackPanel DockPanel.Dock="Right" Margin="10,0">
-                        <StackPanel.Resources>
-                                <Style TargetType="Button">
-                                        <Setter Property="Margin" Value="0,0,0,5" />
+        Title="ListViewItemTemplateSample" Height="150" Width="350">
+    <Grid>
+                <ListView Margin="10" Name="lvDataBinding">
+                        <ListView.ItemTemplate>
+                                <DataTemplate>
+                                        <WrapPanel>
+                                                <TextBlock Text="Name: " />
+                                                <TextBlock Text="{Binding Name}" FontWeight="Bold" />
+                                                <TextBlock Text=", " />
+                                                <TextBlock Text="Age: " />
+                                                <TextBlock Text="{Binding Age}" FontWeight="Bold" />
+                                                <TextBlock Text=" (" />
+                                                <TextBlock Text="{Binding Mail}" TextDecorations="Underline" Foreground="Blue" Cursor="Hand" />
+                                                <TextBlock Text=")" />
+                                        </WrapPanel>
+                                </DataTemplate>
+                        </ListView.ItemTemplate>
+                </ListView>
+        </Grid>
+</Window>
+```
+
++++
+
+```C#
+using System;
+using System.Collections.Generic;
+using System.Windows;
+
+namespace WpfTutorialSamples.ListView_control
+{
+        public partial class ListViewItemTemplateSample : Window
+        {
+                public ListViewItemTemplateSample()
+                {
+                        InitializeComponent();
+                        List<User> items = new List<User>();
+                        items.Add(new User() { Name = "John Doe", Age = 42, Mail = "john@doe-family.com" });
+                        items.Add(new User() { Name = "Jane Doe", Age = 39, Mail = "jane@doe-family.com" });
+                        items.Add(new User() { Name = "Sammy Doe", Age = 13, Mail = "sammy.doe@gmail.com" });
+                        lvDataBinding.ItemsSource = items;
+                }
+        }
+
+        public class User
+        {
+                public string Name { get; set; }
+
+                public int Age { get; set; }
+
+                public string Mail { get; set; }
+        }
+}
+```
+
++++
+
+![A ListView control, using data binding with an ItemTemplate](http://www.wpf-tutorial.com/chapters/listview/images/listview_databinding_itemtemplate.png "A ListView control, using data binding with an ItemTemplate")
+
++++
+
+We use a bunch of TextBlock controls to build each item, where we put part of the text in bold. For the e-mail address, which we added to this example, we underline it, give it a blue color and change the mouse cursor, to make it behave like a hyperlink.
+
++++
+
+## Summary
+
+Using an ItemTemplate and data binding, we produced a pretty cool ListView control. However, it still looks a lot like a ListBox. A very common usage scenario for a ListView is to have columns, sometimes (e.g. in WinForms) referred to as a details view. WPF comes with a built-in view class to handle this, which we will talk about in the next chapter.
+
+---
+
+# ListView with a GridView
+
+In the previous ListView articles, we have used the most basic version of the WPF ListView, which is the one without a custom View specified. This results in a ListView that acts very much like the WPF ListBox, with some subtle differences. The real power lies in the views though and WPF comes with one specialized view built-in: The GridView.
+
++++
+
+By using the GridView, you can get several columns of data in your ListView, much like you see it in Windows Explorer. Just to make sure that everyone can visualize it, we'll start off with a basic example:
+
++++
+
+```XML
+<Window x:Class="WpfTutorialSamples.ListView_control.ListViewGridViewSample"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ListViewGridViewSample" Height="200" Width="400">
+    <Grid>
+                <ListView Margin="10" Name="lvUsers">
+                        <ListView.View>
+                                <GridView>
+                                        <GridViewColumn Header="Name" Width="120" DisplayMemberBinding="{Binding Name}" />
+                                        <GridViewColumn Header="Age" Width="50" DisplayMemberBinding="{Binding Age}" />
+                                        <GridViewColumn Header="Mail" Width="150" DisplayMemberBinding="{Binding Mail}" />
+                                </GridView>
+                        </ListView.View>
+                </ListView>
+        </Grid>
+</Window>
+```
+
++++
+
+```C#
+using System;
+using System.Collections.Generic;
+using System.Windows;
+
+namespace WpfTutorialSamples.ListView_control
+{
+        public partial class ListViewGridViewSample : Window
+        {
+                public ListViewGridViewSample()
+                {
+                        InitializeComponent();
+                        List<User> items = new List<User>();
+                        items.Add(new User() { Name = "John Doe", Age = 42, Mail = "john@doe-family.com" });
+                        items.Add(new User() { Name = "Jane Doe", Age = 39, Mail = "jane@doe-family.com" });
+                        items.Add(new User() { Name = "Sammy Doe", Age = 7, Mail = "sammy.doe@gmail.com" });
+                        lvUsers.ItemsSource = items;
+                }
+        }
+
+        public class User
+        {
+                public string Name { get; set; }
+
+                public int Age { get; set; }
+
+                public string Mail { get; set; }
+        }
+}
+```
+
++++
+
+![A ListView using a GridView for layout](http://www.wpf-tutorial.com/chapters/listview/images/listview_gridview_simple.png "A ListView using a GridView for layout")
+
++++
+
+So, we use the same User class as previously, for test data, which we then bind to the ListView. This is all the same as we saw in previous chapters, but as you can see from the screenshot, the layout is very different. This is the power of data binding - the same data, but presented in a completely different way, just by changing the markup.
+
++++
+
+In the markup (XAML), we define a View for the ListView, using the ListView.View property. We set it to a GridView, which is currently the only included view type in WPF (you can easily create your own though!). The GridView is what gives us the column-based view that you see on the screenshot.
+
++++
+
+Inside of the GridView, we define three columns, one for each of the pieces of data that we wish to show. The **Header** property is used to specify the text that we would like to show for the column and then we use the **DisplayMemberBinding** property to bind the value to a property from our User class.
+
++++
+
+## Templated cell content
+
+Using the **DisplayMemberBinding** property is pretty much limited to outputting simple strings, with no custom formatting at all, but the WPF ListView is much more flexible than that. By specifying a **CellTemplate**, we take full control of how the content is rendered within the specific column cell.
+
++++
+
+The GridViewColumn will use the DisplayMemberBinding as its first priority, it it's present. The second choice will be the CellTemplate property, which we'll use for this example:
+
++++
+
+```XML
+<Window x:Class="WpfTutorialSamples.ListView_control.ListViewGridViewCellTemplateSample"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ListViewGridViewCellTemplateSample" Height="200" Width="400">
+    <Grid>
+                <ListView Margin="10" Name="lvUsers">
+                        <ListView.View>
+                                <GridView>
+                                        <GridViewColumn Header="Name" Width="120" DisplayMemberBinding="{Binding Name}" />
+                                        <GridViewColumn Header="Age" Width="50" DisplayMemberBinding="{Binding Age}" />
+                                        <GridViewColumn Header="Mail" Width="150">
+                                                <GridViewColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                                <TextBlock Text="{Binding Mail}" TextDecorations="Underline" Foreground="Blue" Cursor="Hand" />
+                                                        </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                        </GridViewColumn>
+                                </GridView>
+                        </ListView.View>
+                </ListView>
+        </Grid>
+</Window>
+```
+
++++
+
+![A ListView using a GridView with a custom CellTemplate for one of the columns](http://www.wpf-tutorial.com/chapters/listview/images/listview_gridview_celltemplate.png "A ListView using a GridView with a custom CellTemplate for one of the columns")
+
++++
+
+_Please notice: The Code-behind code for this example is the same as the one used for the first example in this article._
+
+We specify a custom **CellTemplate** for the last column, where we would like to do some special formatting for the e-mail addresses. For the other columns, where we just want basic text output, we stick with the **DisplayMemberBinding**, simply because it requires way less markup.
+
++++
+
+# How-to: ListView with left aligned column names
+
+In a normal ListView, the column names are left aligned, but for some reason, Microsoft decided to center the names by default in the WPF ListView. In many cases this will make your application look out-of-style compared to other Windows applications. This is how the ListView will look in WPF by **default**:
+
++++
+
+![A ListView using a GridView for layout, with the default centered column names](http://www.wpf-tutorial.com/chapters/listview/images/listview_gridview_simple.png "A ListView using a GridView for layout, with the default centered column names")
+
++++
+
+Let's try changing that to left aligned column names. Unfortunately, there are no direct properties on the GridViewColumn to control this, but fortunately that doesn't mean that it can't be changed.
+
+Using a Style, targeted at the GridViewColumHeader, which is the element used to show the header of a GridViewColumn, we can change the HorizontalAlignment property. In this case it defaults to Center, but we can change it to Left, to accomplish what we want:
+
++++
+
+```XML
+<Window x:Class="WpfTutorialSamples.ListView_control.ListViewGridViewSample"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ListViewGridViewSample" Height="200" Width="400">
+    <Grid>
+                <ListView Margin="10" Name="lvUsers">
+                        <ListView.Resources>
+                                <Style TargetType="{x:Type GridViewColumnHeader}">
+                                        <Setter Property="HorizontalContentAlignment" Value="Left" />
                                 </Style>
-                        </StackPanel.Resources>
-                        <TextBlock FontWeight="Bold" Margin="0,0,0,10">ListBox selection</TextBlock>
-                        <Button Name="btnShowSelectedItem" Click="btnShowSelectedItem_Click">Show selected</Button>
-                        <Button Name="btnSelectLast" Click="btnSelectLast_Click">Select last</Button>
-                        <Button Name="btnSelectNext" Click="btnSelectNext_Click">Select next</Button>
-                        <Button Name="btnSelectCSharp" Click="btnSelectCSharp_Click">Select C#</Button>
-                        <Button Name="btnSelectAll" Click="btnSelectAll_Click">Select all</Button>
-                </StackPanel>
-                <ListBox Name="lbTodoList" HorizontalContentAlignment="Stretch" SelectionMode="Extended" SelectionChanged="lbTodoList_SelectionChanged">
-                        <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                        <Grid Margin="0,2">
-                                                <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="100" />
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Text="{Binding Title}" />
-                                                <ProgressBar Grid.Column="1" Minimum="0" Maximum="100" Value="{Binding Completion}" />
-                                        </Grid>
-                                </DataTemplate>
-                        </ListBox.ItemTemplate>
-                </ListBox>
-        </DockPanel>
+                        </ListView.Resources>
+                        <ListView.View>
+                                <GridView>
+                                        <GridViewColumn Header="Name" Width="120" DisplayMemberBinding="{Binding Name}" />
+                                        <GridViewColumn Header="Age" Width="50" DisplayMemberBinding="{Binding Age}" />
+                                        <GridViewColumn Header="Mail" Width="150" DisplayMemberBinding="{Binding Mail}" />
+                                </GridView>
+                        </ListView.View>
+                </ListView>
+        </Grid>
+</Window>
+```
+
++++
+
+![A ListView using a GridView for layout, with left aligned column header names](http://www.wpf-tutorial.com/chapters/listview/images/listview_columnheader_alignment.png "A ListView using a GridView for layout, with left aligned column header names")
+
+The part that does all the work for us, is the Style defined in the Resources of the ListView:
+
++++
+
+```XML
+<Style TargetType="{x:Type GridViewColumnHeader}">
+                                        <Setter Property="HorizontalContentAlignment" Value="Left" />
+</Style>
+```
+
++++
+
+## Local or global style
+
+By defining the Style within the control itself, it only applies to this particular ListView. In many cases you might like to make it apply to all the ListViews within the same Window/Page or perhaps even globally across the application. You can do this by either copying the style to the Window resources or the Application resources. Here's the same example, where we have applied the style to the entire Window instead of just the particular ListView:
+
++++
+
+```XML
+<Window x:Class="WpfTutorialSamples.ListView_control.ListViewGridViewSample"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ListViewGridViewSample" Height="200" Width="400">
+        <Window.Resources>
+                <Style TargetType="{x:Type GridViewColumnHeader}">
+                        <Setter Property="HorizontalContentAlignment" Value="Left" />
+                </Style>
+        </Window.Resources>
+        <Grid>
+                <ListView Margin="10" Name="lvUsers">
+                        <ListView.View>
+                                <GridView>
+                                        <GridViewColumn Header="Name" Width="120" DisplayMemberBinding="{Binding Name}" />
+                                        <GridViewColumn Header="Age" Width="50" DisplayMemberBinding="{Binding Age}" />
+                                        <GridViewColumn Header="Mail" Width="150" DisplayMemberBinding="{Binding Mail}" />
+                                </GridView>
+                        </ListView.View>
+                </ListView>
+        </Grid>
+</Window>
+```
+
++++
+
+In case you want another alignment, e.g. right alignment, you just change the value of the style like this:
+
+```XML
+<Setter Property="HorizontalContentAlignment" Value="Right" />
+```
+
+--
+
+# ListView grouping
+
+As we already talked about earlier, the WPF ListView is very flexible. Grouping is yet another thing that it supports out of the box, and it's both easy to use and extremely customizable. Let's jump straight into the first example, then I'll explain it and afterwards we can use the standard WPF tricks to customize the appearance even further.
+
+For this article, I've borrowed the sample code from a previous article and then expanded on it to support grouping. It looks like this:
+
++++
+
+```XML
+<Window x:Class="WpfTutorialSamples.ListView_control.ListViewGroupSample"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ListViewGroupSample" Height="300" Width="300">
+    <Grid Margin="10">
+        <ListView Name="lvUsers">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Name" Width="120" DisplayMemberBinding="{Binding Name}" />
+                    <GridViewColumn Header="Age" Width="50" DisplayMemberBinding="{Binding Age}" />
+                </GridView>
+            </ListView.View>
+
+            <ListView.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock FontWeight="Bold" FontSize="14" Text="{Binding Name}"/>
+                        </DataTemplate>
+                    </GroupStyle.HeaderTemplate>
+                </GroupStyle>
+            </ListView.GroupStyle>
+        </ListView>
+    </Grid>
 </Window>
 ```
 
@@ -454,298 +533,156 @@ As mentioned, a key difference between the ItemsControl and the ListBox is that 
 
 ```C#
 using System;
-using System.Windows;
 using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Data;
 
-namespace WpfTutorialSamples.ListBox_control
+namespace WpfTutorialSamples.ListView_control
 {
-        public partial class ListBoxSelectionSample : Window
+        public partial class ListViewGroupSample : Window
         {
-                public ListBoxSelectionSample()
+                public ListViewGroupSample()
                 {
                         InitializeComponent();
-                        List<TodoItem> items = new List<TodoItem>();
-                        items.Add(new TodoItem() { Title = "Complete this WPF tutorial", Completion = 45 });
-                        items.Add(new TodoItem() { Title = "Learn C#", Completion = 80 });
-                        items.Add(new TodoItem() { Title = "Wash the car", Completion = 0 });
+                        List<User> items = new List<User>();
+                        items.Add(new User() { Name = "John Doe", Age = 42, Sex = SexType.Male });
+                        items.Add(new User() { Name = "Jane Doe", Age = 39, Sex = SexType.Female });
+                        items.Add(new User() { Name = "Sammy Doe", Age = 13, Sex = SexType.Male });
+                        lvUsers.ItemsSource = items;
 
-                        lbTodoList.ItemsSource = items;
+                        CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(lvUsers.ItemsSource);
+                        PropertyGroupDescription groupDescription = new PropertyGroupDescription("Sex");
+                        view.GroupDescriptions.Add(groupDescription);
                 }
-
-                private void lbTodoList_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
-                {
-                        if(lbTodoList.SelectedItem != null)
-                                this.Title = (lbTodoList.SelectedItem as TodoItem).Title;
-                }
-
-                private void btnShowSelectedItem_Click(object sender, RoutedEventArgs e)
-                {
-                        foreach(object o in lbTodoList.SelectedItems)
-                                MessageBox.Show((o as TodoItem).Title);
-                }
-
-                private void btnSelectLast_Click(object sender, RoutedEventArgs e)
-                {
-                        lbTodoList.SelectedIndex = lbTodoList.Items.Count - 1;
-                }
-
-                private void btnSelectNext_Click(object sender, RoutedEventArgs e)
-                {
-                        int nextIndex = 0;
-                        if((lbTodoList.SelectedIndex >= 0) && (lbTodoList.SelectedIndex < (lbTodoList.Items.Count - 1)))
-                                nextIndex = lbTodoList.SelectedIndex + 1;
-                        lbTodoList.SelectedIndex = nextIndex;
-                }
-
-                private void btnSelectCSharp_Click(object sender, RoutedEventArgs e)
-                {
-                        foreach(object o in lbTodoList.Items)
-                        {
-                                if((o is TodoItem) && ((o as TodoItem).Title.Contains("C#")))
-                                {
-                                        lbTodoList.SelectedItem = o;
-                                        break;
-                                }
-                        }
-                }
-
-                private void btnSelectAll_Click(object sender, RoutedEventArgs e)
-                {
-                        foreach(object o in lbTodoList.Items)
-                                lbTodoList.SelectedItems.Add(o);
-                }
-
-
         }
 
-        public class TodoItem
+        public enum SexType { Male, Female };
+
+        public class User
         {
-                public string Title { get; set; }
-                public int Completion { get; set; }
+                public string Name { get; set; }
+
+                public int Age { get; set; }
+
+                public string Mail { get; set; }
+
+                public SexType Sex { get; set; }
         }
 }
 ```
 
 +++
 
-![Working with selections in the ListBox control](http://www.wpf-tutorial.com/chapters/list-controls/images/listbox_selection.png "Working with selections in the ListBox control")
+![A ListView with items divided into groups](http://www.wpf-tutorial.com/chapters/listview/images/listview_groups_simple.png "A ListView with items divided into groups")
 
 +++
 
-As you can see, I have defined a range of buttons to the right of the ListBox, to either get or manipulate the selection. I've also changed the **SelectionMode** to **Extended**, to allow for the selection of multiple items. This can be done either programmatically, as I do in the example, or by the end-user, by holding down **[Ctrl]** or **[Shift]** while clicking on the items.
+In XAML, I have added a GroupStyle to the ListView, in which I define a template for the header of each group. It consists of a TextBlock control, where I've used a slightly larger and bold text to show that it's a group - as we'll see later on, this can of course be customized a lot more. The TextBlock Text property is bound to a Name property, **but please be aware that this is not the Name property on the data object (in this case the User class)**. Instead, it is the name of the group, as assigned by WPF, based on the property we use to divide the objects into groups.
 
 +++
 
-For each of the buttons, I have defined a click handler in the Code-behind. Each action should be pretty self-explanatory and the C# code used is fairly simple, but if you're still in doubt, try running the example on your own machine and test out the various possibilities in the example.
+In Code-behind, we do the same as we did before: We create a list and add some User objects to it and then we bind the list to the ListView - nothing new there, except for the new Sex property that I've added, which tells whether the user is male or female.
+
+
++++
+
+After assigning an ItemsSource, we use this to get a CollectionView that the ListView creates for us. This specialized View instance contains a lot of possibilities, including the ability to group the items. We use this by adding a so-called PropertyGroupDescription to the GroupDescriptions of the view. This basically tells WPF to group by a specific property on the data objects, in this case the Sex property.
+
++++
+
+## Customizing the group header
+
+The above example was great for showing the basics of ListView grouping, but the look was a tad boring, so let's exploit the fact that WPF lets us define our own templates and spice things up. A common request is to be able to collapse and expand the group, and while WPF doesn't provide this behavior by default, it's somewhat easy to implement yourself. We'll do it by completely re-templating the group container.
+
+It might look a bit cumbersome, but the principles used are somewhat simple and you will see them in other situations when you customize the WPF controls. Here's the code:
+
++++
+
+```XML
+<Window x:Class="WpfTutorialSamples.ListView_control.ListViewCollapseExpandGroupSample"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ListViewCollapseExpandGroupSample" Height="300" Width="300">
+    <Grid Margin="10">
+        <ListView Name="lvUsers">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Name" Width="120" DisplayMemberBinding="{Binding Name}" />
+                    <GridViewColumn Header="Age" Width="50" DisplayMemberBinding="{Binding Age}" />
+                </GridView>
+            </ListView.View>
+
+            <ListView.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.ContainerStyle>
+                        <Style TargetType="{x:Type GroupItem}">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <Expander IsExpanded="True">
+                                            <Expander.Header>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="Gray" FontSize="22" VerticalAlignment="Bottom" />
+                                                    <TextBlock Text="{Binding ItemCount}" FontSize="22" Foreground="Green" FontWeight="Bold" FontStyle="Italic" Margin="10,0,0,0" VerticalAlignment="Bottom" />
+                                                    <TextBlock Text=" item(s)" FontSize="22" Foreground="Silver" FontStyle="Italic" VerticalAlignment="Bottom" />
+                                                </StackPanel>
+                                            </Expander.Header>
+                                            <ItemsPresenter />
+                                        </Expander>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </GroupStyle.ContainerStyle>
+                </GroupStyle>
+            </ListView.GroupStyle>
+        </ListView>
+    </Grid>
+</Window>
+```
+
++++
+
+**_The Code-behind is exactly the same as used in the first example - feel free to scroll up and grab it._**
+
+![A ListView with items divided into customized groups](http://www.wpf-tutorial.com/chapters/listview/images/listview_groups_custom.png "A ListView with items divided into customized groups")
+
++++
+
+Now our groups look a bit more exciting, and they even include an expander button, that will toggle the visibility of the group items when you click it (that's why the single female user is not visible on the screenshot - I collapsed that particular group). By using the ItemCount property that the group exposes, we can even show how many items each group currently consists of.
+
+As you can see, it requires a bit more markup than we're used to, but this example also goes a bit beyond what we usually do, so that seems fair. When you read through the code, you will quickly realize that many of the lines are just common elements like style and template.
 
 +++
 
 ## Summary
 
-The ListBox control is much like the ItemsControl and several of the same techniques can be used. The ListBox does offer a bit more functionality when compared to the ItemsControl, especially the selection handling. For even more functionality, like column headers, you should have a look at the ListView control, which is given a very thorough description later on in this tutorial with several articles explaining all the functionality.
+Adding grouping to the WPF ListView is very simple - all you need is a GroupStyle with a HeaderTemplate, to tell the ListView how to render a group, and a few lines of Code-behind code to tell WPF which property to group by. As you can see from the last example, the group is even very customizable, allowing you to create some really cool views, without too much work.
 
 ---
 
 
-# The ComboBox control
+# ListView sorting
 
-The ComboBox control is in many ways like the ListBox control, but takes up a lot less space, because the list of items is hidden when not needed. The ComboBox control is used many places in Windows, but to make sure that everyone knows how it looks and works, we'll jump straight into a simple example:
-
-+++
-
-```XML
-<Window x:Class="WpfTutorialSamples.ComboBox_control.ComboBoxSample"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ComboBoxSample" Height="150" Width="200">
-    <StackPanel Margin="10">
-        <ComboBox>
-            <ComboBoxItem>ComboBox Item #1</ComboBoxItem>
-            <ComboBoxItem IsSelected="True">ComboBox Item #2</ComboBoxItem>
-            <ComboBoxItem>ComboBox Item #3</ComboBoxItem>
-        </ComboBox>
-    </StackPanel>
-</Window>
-```
-
-+++
-
-![A simple ComboBox control](http://www.wpf-tutorial.com/chapters/list-controls/images/combobox_simple.png "A simple ComboBox control")
-
-+++
-
-In the screenshot, I have activated the control by clicking it, causing the list of items to be displayed. As you can see from the code, the ComboBox, in its simple form, is very easy to use. All I've done here is manually add some items, making one of them the default selected item by setting the IsSelected property on it.
-
-+++
-
-## Custom content
-
-In the first example we only showed text in the items, which is pretty common for the ComboBox control, but since the ComboBoxItem is a ContentControl, we can actually use pretty much anything as content. Let's try making a slightly more sophisticated list of items:
+In the last chapter we saw how we could group items in the WPF ListView by accessing the View instance of the ListView and then adding a group description. Applying sorting to a ListView is just as easy, and most of the process is exactly the same. Let's try a simple example where we sort the user objects by their age:
 
 +++
 
 ```XML
-<Window x:Class="WpfTutorialSamples.ComboBox_control.ComboBoxCustomContentSample"
+<Window x:Class="WpfTutorialSamples.ListView_control.ListViewSortingSample"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ComboBoxCustomContentSample" Height="150" Width="200">
-    <StackPanel Margin="10">
-        <ComboBox>
-            <ComboBoxItem>
-                <StackPanel Orientation="Horizontal">
-                    <Image Source="/WpfTutorialSamples;component/Images/bullet_red.png" />
-                    <TextBlock Foreground="Red">Red</TextBlock>
-                </StackPanel>
-            </ComboBoxItem>
-            <ComboBoxItem>
-                <StackPanel Orientation="Horizontal">
-                    <Image Source="/WpfTutorialSamples;component/Images/bullet_green.png" />
-                    <TextBlock Foreground="Green">Green</TextBlock>
-                </StackPanel>
-            </ComboBoxItem>
-            <ComboBoxItem>
-                <StackPanel Orientation="Horizontal">
-                    <Image Source="/WpfTutorialSamples;component/Images/bullet_blue.png" />
-                    <TextBlock Foreground="Blue">Blue</TextBlock>
-                </StackPanel>
-            </ComboBoxItem>
-        </ComboBox>
-    </StackPanel>
-</Window>
-```
-
-+++
-
-![A ComboBox control with custom content](http://www.wpf-tutorial.com/chapters/list-controls/images/combobox_custom_content.png "A ComboBox control with custom content")
-
-For each of the ComboBoxItem's we now add a StackPanel, in which we add an Image and a TextBlock. This gives us full control of the content as well as the text rendering, as you can see from the screenshot, where both text color and image indicates a color value.
-
-+++
-
-## Data binding the ComboBox
-
-As you can see from the first examples, manually defining the items of a ComboBox control is easy using XAML, but you will likely soon run into a situation where you need the items to come from some kind of data source, like a database or just an in-memory list. Using WPF data binding and a custom template, we can easily render a list of colors, including a preview of the color:
-
-+++
-
-```XML
-<Window x:Class="WpfTutorialSamples.ComboBox_control.ComboBoxDataBindingSample"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ComboBoxDataBindingSample" Height="200" Width="200">
-    <StackPanel Margin="10">
-        <ComboBox Name="cmbColors">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <Rectangle Fill="{Binding Name}" Width="16" Height="16" Margin="0,2,5,2" />
-                        <TextBlock Text="{Binding Name}" />
-                    </StackPanel>
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
-    </StackPanel>
-</Window>
-```
-
-+++
-
-``C#
-using System;
-using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Media;
-
-namespace WpfTutorialSamples.ComboBox_control
-{
-        public partial class ComboBoxDataBindingSample : Window
-        {
-                public ComboBoxDataBindingSample()
-                {
-                        InitializeComponent();
-                        cmbColors.ItemsSource = typeof(Colors).GetProperties();
-                }
-        }
-}
-```
-
-+++
-
-![A ComboBox control using data binding](http://www.wpf-tutorial.com/chapters/list-controls/images/combobox_data_binding.png "A ComboBox control using data binding")
-
-+++
-
-It's actually quite simple: In the Code-behind, I obtain a list of all the colors using a Reflection based approach with the Colors class. I assign it to the **ItemsSource** property of the ComboBox, which then renders each color using the template I have defined in the XAML part.
-
-Each item, as defined by the ItemTemplate, consists of a StackPanel with a Rectangle and a TextBlock, each bound to the color value. This gives us a complete list of colors, with minimal effort - and it looks pretty good too, right?
-
-## IsEditable
-
-In the first examples, the user was only able to select from our list of items, but one of the cool things about the ComboBox is that it supports the possibility of letting the user both select from a list of items or enter their own value. This is extremely useful in situations where you want to help the user by giving them a pre-defined set of options, while still giving them the option to manually enter the desired value. This is all controlled by the **IsEditable** property, which changes the behavior and look of the ComboBox quite a bit:
-
-+++
-
-```XML
-<Window x:Class="WpfTutorialSamples.ComboBox_control.ComboBoxEditableSample"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ComboBoxEditableSample" Height="150" Width="200">
-    <StackPanel Margin="10">
-        <ComboBox IsEditable="True">
-            <ComboBoxItem>ComboBox Item #1</ComboBoxItem>
-            <ComboBoxItem>ComboBox Item #2</ComboBoxItem>
-            <ComboBoxItem>ComboBox Item #3</ComboBoxItem>
-        </ComboBox>
-    </StackPanel>
-</Window>
-```
-
-+++
-
-![An editable ComboBox control](http://www.wpf-tutorial.com/chapters/list-controls/images/combobox_editable.png "An editable ComboBox control")
-
-As you can see, I can enter a completely different value or pick one from the list. If picked from the list, it simply overwrites the text of the ComboBox.
-
-+++
-
-As a lovely little bonus, the ComboBox will automatically try to help the user select an existing value when the user starts typing, as you can see from the next screenshot, where I just started typing "Co":
-
-+++
-
-![A ComboBox control with auto completion](http://www.wpf-tutorial.com/chapters/list-controls/images/combobox_auto_complete.png "A ComboBox control with auto completion")
-
-By default, the matching is not case-sensitive but you can make it so by setting the **IsTextSearchCaseSensitive** to True. If you don't want this auto complete behavior at all, you can disable it by setting the **IsTextSearchEnabled** to False.
-
-+++
-
-## Working with ComboBox selection
-
-A key part of using the ComboBox control is to be able to read the user selection, and even control it with code. In the next example, I've re-used the data bound ComboBox example, but added some buttons for controlling the selection. I've also used the **SelectionChanged** event to capture when the selected item is changed, either by code or by the user, and act on it.
-
-+++
-
-```XML
-<Window x:Class="WpfTutorialSamples.ComboBox_control.ComboBoxSelectionSample"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ComboBoxSelectionSample" Height="125" Width="250">
-    <StackPanel Margin="10">
-        <ComboBox Name="cmbColors" SelectionChanged="cmbColors_SelectionChanged">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <Rectangle Fill="{Binding Name}" Width="16" Height="16" Margin="0,2,5,2" />
-                        <TextBlock Text="{Binding Name}" />
-                    </StackPanel>
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
-        <WrapPanel Margin="15" HorizontalAlignment="Center">
-            <Button Name="btnPrevious" Click="btnPrevious_Click" Width="55">Previous</Button>
-            <Button Name="btnNext" Click="btnNext_Click" Margin="5,0" Width="55">Next</Button>
-            <Button Name="btnBlue" Click="btnBlue_Click" Width="55">Blue</Button>
-        </WrapPanel>
-    </StackPanel>
+        Title="ListViewSortingSample" Height="200" Width="300">
+    <Grid Margin="10">
+        <ListView Name="lvUsers">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Name" Width="120" DisplayMemberBinding="{Binding Name}" />
+                    <GridViewColumn Header="Age" Width="50" DisplayMemberBinding="{Binding Age}" />
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
 </Window>
 ```
 
@@ -754,41 +691,247 @@ A key part of using the ComboBox control is to be able to read the user selectio
 ```C#
 using System;
 using System.Collections.Generic;
-using System.Reflection;
+using System.ComponentModel;
 using System.Windows;
-using System.Windows.Media;
+using System.Windows.Data;
 
-namespace WpfTutorialSamples.ComboBox_control
+namespace WpfTutorialSamples.ListView_control
 {
-        public partial class ComboBoxSelectionSample : Window
+        public partial class ListViewSortingSample : Window
         {
-                public ComboBoxSelectionSample()
+                public ListViewSortingSample()
                 {
                         InitializeComponent();
-                        cmbColors.ItemsSource = typeof(Colors).GetProperties();
+                        List<User> items = new List<User>();
+                        items.Add(new User() { Name = "John Doe", Age = 42 });
+                        items.Add(new User() { Name = "Jane Doe", Age = 39 });
+                        items.Add(new User() { Name = "Sammy Doe", Age = 13 });
+                        items.Add(new User() { Name = "Donna Doe", Age = 13 });
+                        lvUsers.ItemsSource = items;
+
+                        CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(lvUsers.ItemsSource);
+                        view.SortDescriptions.Add(new SortDescription("Age", ListSortDirection.Ascending));
+                }
+        }
+
+        public class User
+        {
+                public string Name { get; set; }
+
+                public int Age { get; set; }
+        }
+}
+```
+
++++
+
+![A sorted ListView](http://www.wpf-tutorial.com/chapters/listview/images/listview_sorting_simple.png "A sorted ListView")
+
+The XAML looks just like a previous example, where we simply have a couple of columns for displaying information about the user - nothing new here.
+
++++
+
+In the Code-behind, we once again create a list of User objects, which we then assign as the ItemsSource of the ListView. Once we've done that, we use the ItemsSource property to get the CollectionView instance that the ListView automatically creates for us and which we can use to manipulate how the ListView shows our objects.
+
+With the view object in our hand, we add a new SortDescription to it, specifying that we want our list sorted by the Age property, in ascending order. As you can see from the screenshot, this works perfectly well - the list is sorted by age, instead of being in the same order as the items were added.
+
++++
+
+## Multiple sort criteria
+
+As shown in the first example, sorting is very easy, but on the screenshot you'll see that Sammy comes before Donna. They have the same age, so in this case, WPF will just use the order in which they were added. Fortunately, WPF lets us specify as many sort criteria as we want. In the example above, try changing the view-related code into something like this:
+
++++
+
+```C#
+CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(lvUsers.ItemsSource);
+view.SortDescriptions.Add(new SortDescription("Age", ListSortDirection.Ascending));
+view.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
+```
+
++++
+
+![A sorted ListView, using multiple criteria](http://www.wpf-tutorial.com/chapters/listview/images/listview_sorting_multiple.png "A sorted ListView, using multiple criteria")
+
+Now the view will be sorted using age first, and when two identical values are found, the name will be used as a secondary sorting parameter.
+
++++
+
+## Summary
+
+It's very easy to sort the contents of a ListView, as seen in the above examples, but so far, all the sorting is decided by the programmer and not the end-user. In the next article I'll give you a how-to article showing you how to let the user decide the sorting by clicking on the columns, as seen in Windows.
+
+---
+
+# How-to: ListView with column sorting
+
+In the last chapter we saw how we could easily sort a ListView from Code-behind, and while this will suffice for some cases, it doesn't allow the end-user to decide on the sorting. Besides that, there was no indication on which column the ListView was sorted by. In Windows, and in many user interfaces in general, it's common to illustrate sort directions in a list by drawing a triangle next to the column name currently used to sort by.
+
++++
+
+In this how-to article, I'll give you a practical solution that gives us all of the above, but please bear in mind that some of the code here goes a bit beyond what we have learned so far - that's why it has the "how-to" label.
+
+This article builds upon the previous one, but I'll still explain each part as we go along. Here's our goal - a ListView with column sorting, including visual indication of sort field and direction. The user simply clicks a column to sort by and if the same column is clicked again, the sort direction is reversed. 
+
++++
+
+![A ListView with column sorting](http://www.wpf-tutorial.com/chapters/listview/images/listview_column_sorting.png "The goal: A ListView with column sorting")
+
++++
+
+## The XAML
+
+The first thing we need is some XAML to define our user interface. It currently looks like this:
+
++++
+
+```XML
+<Window x:Class="WpfTutorialSamples.ListView_control.ListViewColumnSortingSample"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ListViewColumnSortingSample" Height="200" Width="350">
+    <Grid Margin="10">
+        <ListView Name="lvUsers">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Width="120" DisplayMemberBinding="{Binding Name}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Tag="Name" Click="lvUsersColumnHeader_Click">Name</GridViewColumnHeader>
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
+                    <GridViewColumn Width="80" DisplayMemberBinding="{Binding Age}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Tag="Age" Click="lvUsersColumnHeader_Click">Age</GridViewColumnHeader>
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
+                    <GridViewColumn Width="80" DisplayMemberBinding="{Binding Sex}">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader Tag="Sex" Click="lvUsersColumnHeader_Click">Sex</GridViewColumnHeader>
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
+</Window>
+```
+
++++
+
+Notice how I have specified headers for each of the columns using an actual GridViewColumnHeader element instead of just specifying a string. This is done so that I may set additional properties, in this case the **Tag** property as well as the **Click** event.
+
++++
+
+The **Tag** property is used to hold the field name that will be used to sort by, if this particular column is clicked. This is done in the _lvUsersColumnHeader_Click_ event that each of the columns subscribes to.
+
+That was the key concepts of the XAML. Besides that, we bind to our Code-behind properties Name, Age and Sex, which we'll discuss now.
+
++++
+
+## The Code-behind
+
+In Code-behind, there are quite a few things happening. I use a total of three classes, which you would normally divide up into individual files, but for convenience, I have kept them in the same file, giving us a total of ~100 lines. First the code and then I'll explain how it works:
+
++++
+
+```XML
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Media;
+
+namespace WpfTutorialSamples.ListView_control
+{
+        public partial class ListViewColumnSortingSample : Window
+        {
+                private GridViewColumnHeader listViewSortCol = null;
+                private SortAdorner listViewSortAdorner = null;
+
+                public ListViewColumnSortingSample()
+                {
+                        InitializeComponent();
+                        List<User> items = new List<User>();
+                        items.Add(new User() { Name = "John Doe", Age = 42, Sex = SexType.Male });
+                        items.Add(new User() { Name = "Jane Doe", Age = 39, Sex = SexType.Female });
+                        items.Add(new User() { Name = "Sammy Doe", Age = 13, Sex = SexType.Male });
+                        items.Add(new User() { Name = "Donna Doe", Age = 13, Sex = SexType.Female });
+                        lvUsers.ItemsSource = items;
                 }
 
-                private void btnPrevious_Click(object sender, RoutedEventArgs e)
+                private void lvUsersColumnHeader_Click(object sender, RoutedEventArgs e)
                 {
-                        if(cmbColors.SelectedIndex > 0)
-                                cmbColors.SelectedIndex = cmbColors.SelectedIndex - 1;
+                        GridViewColumnHeader column = (sender as GridViewColumnHeader);
+                        string sortBy = column.Tag.ToString();
+                        if(listViewSortCol != null)
+                        {
+                                AdornerLayer.GetAdornerLayer(listViewSortCol).Remove(listViewSortAdorner);
+                                lvUsers.Items.SortDescriptions.Clear();
+                        }
+
+                        ListSortDirection newDir = ListSortDirection.Ascending;
+                        if(listViewSortCol == column && listViewSortAdorner.Direction == newDir)
+                                newDir = ListSortDirection.Descending;
+
+                        listViewSortCol = column;
+                        listViewSortAdorner = new SortAdorner(listViewSortCol, newDir);
+                        AdornerLayer.GetAdornerLayer(listViewSortCol).Add(listViewSortAdorner);
+                        lvUsers.Items.SortDescriptions.Add(new SortDescription(sortBy, newDir));
+                }
+        }
+
+        public enum SexType { Male, Female };
+
+        public class User
+        {
+                public string Name { get; set; }
+
+                public int Age { get; set; }
+
+                public string Mail { get; set; }
+
+                public SexType Sex { get; set; }
+        }
+
+        public class SortAdorner : Adorner
+        {
+                private static Geometry ascGeometry =
+                        Geometry.Parse("M 0 4 L 3.5 0 L 7 4 Z");
+
+                private static Geometry descGeometry =
+                        Geometry.Parse("M 0 0 L 3.5 4 L 7 0 Z");
+
+                public ListSortDirection Direction { get; private set; }
+
+                public SortAdorner(UIElement element, ListSortDirection dir)
+                        : base(element)
+                {
+                        this.Direction = dir;
                 }
 
-                private void btnNext_Click(object sender, RoutedEventArgs e)
+                protected override void OnRender(DrawingContext drawingContext)
                 {
-                        if(cmbColors.SelectedIndex < cmbColors.Items.Count-1)
-                                cmbColors.SelectedIndex = cmbColors.SelectedIndex + 1;
-                }
+                        base.OnRender(drawingContext);
 
-                private void btnBlue_Click(object sender, RoutedEventArgs e)
-                {
-                        cmbColors.SelectedItem = typeof(Colors).GetProperty("Blue");
-                }
+                        if(AdornedElement.RenderSize.Width < 20)
+                                return;
 
-                private void cmbColors_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
-                {
-                        Color selectedColor = (Color)(cmbColors.SelectedItem as PropertyInfo).GetValue(null, null);
-                        this.Background = new SolidColorBrush(selectedColor);
+                        TranslateTransform transform = new TranslateTransform
+                                (
+                                        AdornedElement.RenderSize.Width - 15,
+                                        (AdornedElement.RenderSize.Height - 5) / 2
+                                );
+                        drawingContext.PushTransform(transform);
+
+                        Geometry geometry = ascGeometry;
+                        if(this.Direction == ListSortDirection.Descending)
+                                geometry = descGeometry;
+                        drawingContext.DrawGeometry(Brushes.Black, null, geometry);
+
+                        drawingContext.Pop();
                 }
         }
 }
@@ -796,18 +939,142 @@ namespace WpfTutorialSamples.ComboBox_control
 
 +++
 
-![A ComboBox control where we work with the selection](http://www.wpf-tutorial.com/chapters/list-controls/images/combobox_selection.png "A ComboBox control where we work with the selection")
+Allow me to start from the bottom and then work my way up while explaining what happens. The last class in the file is an Adorner class called **SortAdorner**. All this little class does is to draw a triangle, either pointing up or down, depending on the sort direction. WPF uses the concept of adorners to allow you to paint stuff over other controls, and this is exactly what we want here: The ability to draw a sorting triangle on top of our ListView column header.
 
 +++
 
-The interesting part of this example is the three event handlers for our three buttons, as well as the **SelectionChanged** event handler. In the first two, we select the previous or the next item by reading the **SelectedIndex** property and then subtracting or adding one to it. Pretty simple and easy to work with.
+The **SortAdorner** works by defining two **Geometry** objects, which are basically used to describe 2D shapes - in this case a triangle with the tip pointing up and one with the tip pointing down. The Geometry.Parse() method uses the list of points to draw the triangles, which will be explained more thoroughly in a later article.
 
 +++
 
-In the third event handler, we use the SelectedItem to select a specific item based on the value. I do a bit of extra work here (using .NET reflection), because the ComboBox is bound to a list of properties, each being a color, instead of a simple list of colors, but basically it's all about giving the value contained by one of the items to the **SelectedItem** property.
+The **SortAdorner** is aware of the sort direction, because it needs to draw the proper triangle, but is not aware of the field that we order by - this is handled in the UI layer.
+
+The **User** class is just a basic information class, used to contain information about a user. Some of this information is used in the UI layer, where we bind to the Name, Age and Sex properties.
 
 +++
 
-In the fourth and last event handler, I respond to the selected item being changed. When that happens, I read the selected color (once again using Reflection, as described above) and then use the selected color to create a new background brush for the Window. The effect can be seen on the screenshot.
+In the Window class, we have two methods: The constructor where we build a list of users and assign it to the ItemsSource of our ListView, and then the more interesting click event handler that will be hit when the user clicks a column. In the top of the class, we have defined two private variables: _listViewSortCol_ and _listViewSortAdorner_. These will help us keep track of which column we're currently sorting by and the adorner we placed to indicate it.
 
-If you're working with an editable ComboBox (IsEditable property set to true), you can read the **Text** property to know the value the user has entered or selected.
++++
+
+In the lvUsersColumnHeader_Click event handler, we start off by getting a reference to the column that the user clicked. With this, we can decide which property on the User class to sort by, simply by looking at the Tag property that we defined in XAML. We then check if we're already sorting by a column - if that is the case, we remove the adorner and clear the current sort descriptions.
+
++++
+
+After that, we're ready to decide the direction. The default is ascending, but we do a check to see if we're already sorting by the column that the user clicked - if that is the case, we change the direction to descending.
+
+In the end, we create a new SortAdorner, passing in the column that it should be rendered on, as well as the direction. We add this to the AdornerLayer of the column header, and at the very end, we add a SortDescription to the ListView, to let it know which property to sort by and in which direction.
+
++++
+
+## Summary
+
+Congratulations, you now have a fully sortable ListView with visual indication of sort column and direction. In case you want to know more about some of the concepts used in this article, like data binding, geometry or ListViews in general, then please check out some of the other articles, where each of the subjects are covered in depth.
+
+---
+
+# ListView filtering
+
+We've already done several different things with the ListView, like grouping and sorting, but another very useful ability is filtering. Obviously, you could just limit the items you add to the ListView in the first place, but often you would need to filter the ListView dynamically, in runtime, usually based on a user entered filter string. Luckily for us, the view mechanisms of the ListView also make it easy to do just that, like we saw it with sorting and grouping.
+
++++
+
+Filtering is actually quite easy to do:
+
+```XML
+<Window x:Class="WpfTutorialSamples.ListView_control.FilteringSample"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="FilteringSample" Height="200" Width="300">
+    <DockPanel Margin="10">
+        <TextBox DockPanel.Dock="Top" Margin="0,0,0,10" Name="txtFilter" TextChanged="txtFilter_TextChanged" />
+        <ListView Name="lvUsers">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Name" Width="120" DisplayMemberBinding="{Binding Name}" />
+                    <GridViewColumn Header="Age" Width="50" DisplayMemberBinding="{Binding Age}" />
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </DockPanel>
+</Window>
+```
+
++++
+
+```XML
+using System;
+using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Data;
+
+namespace WpfTutorialSamples.ListView_control
+{
+        public partial class FilteringSample : Window
+        {
+                public FilteringSample()
+                {
+                        InitializeComponent();
+                        List<User> items = new List<User>();
+                        items.Add(new User() { Name = "John Doe", Age = 42 });
+                        items.Add(new User() { Name = "Jane Doe", Age = 39 });
+                        items.Add(new User() { Name = "Sammy Doe", Age = 13 });
+                        items.Add(new User() { Name = "Donna Doe", Age = 13 });
+                        lvUsers.ItemsSource = items;
+
+                        CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(lvUsers.ItemsSource);
+                        view.Filter = UserFilter;
+                }
+
+                private bool UserFilter(object item)
+                {
+                        if(String.IsNullOrEmpty(txtFilter.Text))
+                                return true;
+                        else
+                                return ((item as User).Name.IndexOf(txtFilter.Text, StringComparison.OrdinalIgnoreCase) >= 0);
+                }
+
+                private void txtFilter_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+                {
+                        CollectionViewSource.GetDefaultView(lvUsers.ItemsSource).Refresh();
+                }
+        }
+
+        public enum SexType { Male, Female };
+
+        public class User
+        {
+                public string Name { get; set; }
+
+                public int Age { get; set; }
+
+                public string Mail { get; set; }
+
+                public SexType Sex { get; set; }
+        }
+}
+```
+
++++
+
+![A filtered ListView](http://www.wpf-tutorial.com/chapters/listview/images/listview_filtering_simple.png "A filtered ListView")
+
+The XAML part is pretty simple: We have a TextBox, where the user can enter a search string, and then a ListView to show the result in.
+
++++
+
+In Code-behind, we start off by adding some User objects to the ListView, just like we did in previous examples. The interesting part happens in the last two lines of the constructor, where we obtain a reference to the **CollectionView** instance for the ListView and then assign a delegate to the **Filter** property. This delegate points to the function called **UserFilter**, which we have implemented just below. It takes each item as the first (and only) parameter and then returns a boolean value that indicates whether or not the given item should be visible on the list.
+
++++
+
+In the **UserFilter()** method, we take a look at the TextBox control (txtFilter), to see if it contains any text - if it does, we use it to check whether or not the name of the User (which is the property we have decided to filter on) contains the entered string, and then return true or false depending on that. If the TextBox is empty, we return true, because in that case we want all the items to be visible.
+
++++
+
+The txtFilter_TextChanged event is also important. Each time the text changes, we get a reference to the View object of the ListView and then call the Refresh() method on it. This ensures that the Filter delegate is called each time the user changes the value of the search/filter string text box.
+
++++
+
+## Summary
+
+This was a pretty simple implementation, but since you get access to each item, in this case of the User class, you can do any sort of custom filtering that you like, since you have access to all of the data about each of the items in the list. For instance, the above example could easily be changed to filter on age, by looking at the Age property instead of the Name property, or you could modify it to look at more than one property, e.g. to filter out users with an age below X AND a name that doesn't contain "Y".
