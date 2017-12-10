@@ -3,13 +3,9 @@
 WPF, which stands for Windows Presentation Foundation, is Microsoft's latest approach to a GUI framework, used with the .NET framework.
 
 But what IS a GUI framework? GUI stands for Graphical User Interface, and you're probably looking at one right now. Windows has a GUI for working with your computer, and the browser that you're likely reading this document in has a GUI that allows you to surf the web.
-
----
-
++++
 A GUI framework allows you to create an application with a wide range of GUI elements, like labels, textboxes and other well known elements. Without a GUI framework you would have to draw these elements manually and handle all of the user interaction scenarios like text and mouse input. This is a LOT of work, so instead, most developers will use a GUI framework which will do all the basic work and allow the developers to focus on making great applications.
-
----
-
++++
 There are a lot of GUI frameworks out there, but for .NET developers, the most interesting ones are currently WinForms and WPF. WPF is the newest, but Microsoft is still maintaining and supporting WinForms. As you will see in the next chapter, there are quite a few differences between the two frameworks, but their purpose is the same: To make it easy to create applications with a great GUI.
 
 In the next chapter, we will look at the differences between WinForms and WPF.
