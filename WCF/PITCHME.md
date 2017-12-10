@@ -18,7 +18,7 @@ before proceeding.
 3. Exposing 2 service endpoints. 
 4. Creating a windows and a web Client applications.
  
---
+---
  
 ## Let's take the scenario that we discussed in [Part 2](http://csharp-video-tutorials.blogspot.com/2013/11/part-2-creating-remoting-service-and_17.html)
 We have 2 clients and we need to implement a service a for them. 
@@ -34,7 +34,7 @@ To meet the requirement of the first client, we implemented a **web service**and
 
 In this video, we will create a single **WCF service**, and **configure 2 endpoints** to meet the requirements of both the clients.
  
---
+---
  
 ### Creating the WCF Service:
 
@@ -46,7 +46,7 @@ should automatically generate 2 files (**HelloService.cs** &
 **System.ServiceModel** assembly is added.
 4. Copy and paste the following code in **IHelloService.cs** file
  
---
+---
  
 ```C#
  using System.ServiceModel;
@@ -61,6 +61,9 @@ should automatically generate 2 files (**HelloService.cs** &
      }
  }
 ```
+ 
+---
+ 
 5. Copy and paste the following code in **HelloService.cs**
 ```C#
  namespace HelloService
@@ -75,10 +78,15 @@ should automatically generate 2 files (**HelloService.cs** &
  }
  
 ```
+ 
+---
+ 
  That's it we are done implementing a WCF Service. The next step is to
 **host the service** using a **console application**. A WCF service can
 also be hosted in a **Windows application**, or **Windows Service** or
 **IIS**. We will discuss these hosting options in a later video session.
+  
+---
  
 ### Hosting the WCF service using a console application
 1. Right click on **HelloService** solution in Solution Explorer and
@@ -94,7 +102,9 @@ endpoints** in the configuration. One endpoint uses
 client. The other endpoint uses **netTcpBinding**, which communicates
 over **TCP** protocol using **binary messages**. This endpoint will
 satisfy the requirement of the second client. 
-
+ 
+---
+ 
 ```html
  <?xml version="1.0" encoding="utf-8" ?>
  <configuration>
@@ -122,6 +132,9 @@ satisfy the requirement of the second client. 
    </system.serviceModel>
  </configuration>
 ```
+ 
+---
+ 
  **4.** Copy and paste the following code in **Program.cs** file
 
 ```C#
@@ -142,12 +155,18 @@ satisfy the requirement of the second client. 
      }
  }
 ```
+ 
+---
+ 
 Build the solution. Set **HelloServiceHost** as startup project and run
 it by pressing **CTRL + F5** keys.
 
 Now let's build a web application that is going to **consume the WCF
 service**using the endpoint with **basicHttpBinding**. basicHttpBinding
 communicates over HTTP protocol using XML messages.
+ 
+---
+ 
 
 1. Create a **new asp.net empty web application** and name it **HelloWebClient**
 2. Right click on **References** folder and select **Add Service
@@ -157,6 +176,9 @@ textbox type **HelloService**and click **OK**. This should generate a
 proxy class to communicate with the service.
 3. Add a new webform. Copy and paste the following HTML in
 WebForm1.aspx\
+ 
+---
+ 
 
 ```HTML
  <div style="font-family:Arial">
@@ -175,6 +197,9 @@ WebForm1.aspx\
      Label1.Text = client.GetMessage(TextBox1.Text);
  } 
 ```
+ 
+---
+ 
 Now let's build a **windows application** that is going to **consume the
 WCF service** using the endpoint with **netTcpBinding**. netTcpBinding
 communicated over TCP protocol using binary messages.
@@ -187,6 +212,9 @@ textbox type **HelloService**and click **OK.**This should generate a
 proxy class to communicate with the service.\
 3. On **Form1**, drag and drop a textbox, a button and a label
 control. Double click the button to generate the click event handler.\
+ 
+---
+ 
 4. Copy and paste the following code in Form1.cs file
 
 ```C#
@@ -196,6 +224,9 @@ control. Double click the button to generate the click event handler.\
      label1.Text = client.GetMessage(textBox1.Text);
  }
 ```
+ 
+---
+ 
  [![wcf tutorial](http://1.bp.blogspot.com/-uCLgi3fnHv4/UofgWLaI2-I/AAAAAAAAHfI/wqIjnIsaW14/s1600/WCF+Tutorial.png)](http://www.youtube.com/playlist?list=PL6n9fhu94yhVxEyaRMaMN_-qnDdNVGsL1)
 
 Based on PRAGIM TECHNOLOGIES' [blog](http://csharp-video-tutorials.blogspot.cz/).
