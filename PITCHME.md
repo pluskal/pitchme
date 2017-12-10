@@ -1,67 +1,57 @@
-# What is WPF?
 
-WPF, which stands for Windows Presentation Foundation, is Microsoft's latest approach to a GUI framework, used with the .NET framework.
+# Visual Studio Comunity
 
-But what IS a GUI framework? GUI stands for Graphical User Interface, and you're probably looking at one right now. Windows has a GUI for working with your computer, and the browser that you're likely reading this document in has a GUI that allows you to surf the web.
+WPF is, as already described, a combination of XAML (markup) and C#/VB.NET/any other .NET language. All of it can be edited in any text editor, even Notepad included in Windows, and then compiled from the command line. However, most developers prefer to use an IDE (Integrated Development Environment), since it makes everything, from writing code to designing the interface and compiling it all so much easier.
 
-+++
+The preferred choice for a .NET/WPF IDE is Visual Studio, which costs a lot quite a bit of money though. Luckily, Microsoft has decided to make it easy and absolutely free for everyone to get started with .NET and WPF, so they have created a free version of Visual Studio, called Visual Studio Comunity. This version contains less functionality than the real Visual Studio, but it has everything that you need to get started learning WPF and make real applications.
 
-A GUI framework allows you to create an application with a wide range of GUI elements, like labels, textboxes and other well known elements. Without a GUI framework you would have to draw these elements manually and handle all of the user interaction scenarios like text and mouse input. This is a LOT of work, so instead, most developers will use a GUI framework which will do all the basic work and allow the developers to focus on making great applications.
+The latest version, as of writing this text, is Microsoft Visual Studio Comunity 2017. To create WPF applications, you should get the Windows Desktop edition, which can be downloaded for free from this website: [Visual Studio 2017](Comunity).
 
-+++
+After downloading and installing, you can use this product for 30 days without any registration. After that, you will need to register it on the above mentioned website, which is also completely free.
 
-There are a lot of GUI frameworks out there, but for .NET developers, the most interesting ones are currently WinForms and WPF. WPF is the newest, but Microsoft is still maintaining and supporting WinForms. As you will see in the next chapter, there are quite a few differences between the two frameworks, but their purpose is the same: To make it easy to create applications with a great GUI.
-
-In the next chapter, we will look at the differences between WinForms and WPF.
-
----
-
-# WPF vs. WinForms
+# Hello, WPF!
 
 
-In the previous chapter, we talked about what WPF is and a little bit about WinForms. In this chapter, I will try to compare the two, because while they do serve the same purpose, there is a LOT of differences between them. If you have never worked with WinForms before, and especially if WPF is your very first GUI framework, you may skip this chapter, but if you're interested in the differences then read on.
+The first and very classic example in pretty much any programming tutorial is the "Hello, world!" example, but in this tutorial we'll go nuts and change that into "Hello, WPF!" instead. The goal is simply to get this piece of text onto the screen, to show you how easy it is to get started.
 
-+++
+The rest of this tutorial assumes that you have an IDE installed, preferably Visual Studio or Visual Studio Express (see the previous article for instructions on how to get it). If you're using another product, you will have to adapt the instructions to your product.
 
-The single most important difference between WinForms and WPF is the fact that while WinForms is simply a layer on top of the standard Windows controls (e.g. a TextBox), WPF is built from scratch and doesn't rely on standard Windows controls in almost all situations. This might seem like a subtle difference, but it really isn't, which you will definitely notice if you have ever worked with a framework that depends on Win32/WinAPI.
+In Visual Studio, start by selecting **New project** from the **File** menu. On the left, you should have a tree of categories. This tutorial will focus on C# whenever code is involved, so you should select that from the list of templates, and since we'll be creating Windows applications, you should select **Windows** from the tree. This will give you a list of possible Windows application types to the right, where you should select a **WPF Application**. I named my project "HelloWPF" in the **Name** text field. Make sure that the rest of the settings in the bottom part of the dialog are okay and then press the **Ok** button.
 
-+++
+Your new project will have a couple of files, but we will focus on just one of them now: _MainWindox.xaml_. This is the applications primary window, the one shown first when launching the application, unless you specifically change this. The XAML code found in it (XAML is discussed in details in another chapter of this tutorial) should look something like this:
 
-A great example of this is a button with an image and text on it. This is not a standard Windows control, so WinForms doesn't offer you this possibility out of the box. Instead you will have to draw the image yourself, implement your own button that supports images or use a 3rd party control. With WPF, a button can contain anything because it's essentially a border with content and various states (e.g. untouched, hovered, pressed). The WPF button is "look-less", as are most other WPF controls, which means that it can contain a range of other controls inside of it. You want a button with an image and some text? 
+```xaml
+<Window x:Class="WpfApplication1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="350" Width="525">
+    <Grid>
 
-+++
+    </Grid>
+</Window>
+```
 
-Just put an Image and a TextBlock control inside of the button and you're done! You simply don’t get this kind of flexibility out of the standard WinForms controls, which is why there's a big market for rather simple implementations of controls like buttons with images and so on.
+This is the base XAML that Visual Studio creates for our window, all parts of it explained in the chapters on XAML and "The Window". You can actually run the application now (select Debug -> Start debugging or press **F5**) to see the empty window that our application currently consists of, but now it's time to get our message on the screen. <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 
-+++
+We'll do it by adding a TextBlock control to the Grid panel, with our aforementioned message as the content:
 
-The drawback to this flexibility is that sometimes you will have to work harder to achieve something that was very easy with WinForms, because it was created for just the scenario you need it for. At least that's how it feels in the beginning, where you find yourself creating templates to make a ListView with an image and some nicely aligned text, something that the WinForms ListViewItem does in a single line of code.
+```xaml
+<Window x:Class="WpfApplication1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="350" Width="525">
+    <Grid>
+                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="72">
+                        Hello, WPF!
+                </TextBlock>
+    </Grid>
+</Window>
+```
 
-+++
+Try running the application now (select Debug -> Start debugging or press **F5**) and see the beautiful result of your hard work - your first WPF application:
 
-This was just one difference, but as you work with WPF, you will realize that it is in fact the underlying reason for many of the other differences - WPF is simply just doing things in its own way, for better and for worse. You're no longer constrained to doing things the Windows way, but to get this kind of flexibility, you pay with a little more work when you're really just looking to do things the Windows way.
+![Hello, WPF! - the result](/chapters/wpf-application/images/hello_wpf.png "Hello, WPF! - the result")
 
-+++
+You will notice that we used three different attributes on the TextBlock to get a custom alignment (in the middle of the window), as well the FontSize property to get bigger text. All of these concepts will be treated in later articles.
 
-The following is a completely subjective list of the key advantages for WPF and WinForms. It should give you a better idea of what you're going into.
-
-+++
-
-## WPF advantages
-
-*   It's newer and thereby more in tune with current standards
-*   Microsoft is using it for a lot of new applications, e.g. Visual Studio
-*   It's more flexible, so you can do more things without having to write or buy new controls
-*   When you do need to use 3rd party controls, the developers of these controls will likely be more focused on WPF because it's newer
-*   XAML makes it easy to create and edit your GUI, and allows the work to be split between a designer (XAML) and a programmer (C#, VB.NET etc.)
-*   Databinding, which allows you to get a more clean separation of data and layout
-*   Uses hardware acceleration for drawing the GUI, for better performance
-*   It allows you to make user interfaces for both Windows applications and web applications (Silverlight/XBAP)
-
-+++
-
-## WinForms advantages
-
-*   It's older and thereby more tried and tested
-*   There are already a lot of 3rd party controls that you can buy or get for free
-*   The designer in Visual Studio is still, as of writing, better for WinForms than for WPF, where you will have to do more of the work yourself with WPF
+Congratulations on making it this far. Now go read the rest of the tutorial and soon you will master WPF!
