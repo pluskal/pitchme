@@ -195,6 +195,7 @@ namespace WpfTutorialSamples
 
 The cool thing in this example, compared to just using the StartupUri property, is that we get to manipulate the startup window before showing it. In this, we change the title of it, which is not terribly useful, but you could also subscribe to events or perhaps show a splash screen. When you have all the control, there are many possibilities. We will look deeper into several of them in the next articles of this tutorial.
 
+---
 
 # Command-line parameters in WPF
 
@@ -202,9 +203,13 @@ Command-line parameters are a technique where you can pass a set of parameters t
 
 notepad.exe c:\Windows\win.ini
 
++++
+
 This will open Notepad with the win.ini file opened (you may have to adjust the path to match your system). Notepad simply looks for one or several parameters and then uses them and your application can do the same!
 
 Command-line parameters are passed to your WPF application through the Startup event, which we subscribed to in the App.xaml article. We will do the same in this example, and then use the value passed on to through the method arguments. First, the App.xaml file:
+
++++
 
 ```XML
 <Application x:Class="WpfTutorialSamples.App"
@@ -215,7 +220,11 @@ Command-line parameters are passed to your WPF application through the Startup e
 </Application>
 ```
 
++++
+
 All we do here is to subscribe to the **Startup** event, replacing the **StartupUri** property. The event is then implemented in App.xaml.cs:
+
++++
 
 ```XML
 using System;
@@ -238,19 +247,27 @@ namespace WpfTutorialSamples
 }
 ```
 
++++
+
 The **StartupEventArgs** is what we use here. It's passed into the Application Startup event, with the name e. It has the property **Args**, which is an array of strings. Command-line parameters are separated by spaces, unless the space is inside a quoted string.
+
+---
 
 ## Testing the command-line parameter
 
 If you run the above example, nothing will happen, because no command-line parameters have been specified. Fortunately, Visual Studio makes it easy to test this in your application. From the **Project** menu select **"[Project name] properties"** and then go to the **Debug** tab, where you can define a command-line parameter. It should look something like this:
 
++++
+
 ![The command-line project settings](http://www.wpf-tutorial.com/chapters/wpf-application/images/commandline_parameters.png "The command-line project settings")
+
++++
 
 Try running the application and you will see it respond to your parameter.
 
-<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-
 Of course, the message isn't terribly useful. Instead you might want to either pass it to the constructor of your main window or call a public open method on it, like this:
+
++++
 
 ```XML
 using System;
@@ -275,6 +292,8 @@ namespace WpfTutorialSamples
         }
 }
 ```
+
+---
 
 ## Command-line possibilities
 
