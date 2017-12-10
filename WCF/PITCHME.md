@@ -10,11 +10,15 @@ Please watch [Part2](http://csharp-video-tutorials.blogspot.com/2013/11/part-2-c
 from [WCF videotutorial](http://www.youtube.com/playlist?list=PL6n9fhu94yhVxEyaRMaMN_-qnDdNVGsL1)
 before proceeding. 
 
+---
+
 ## In this video, we will discuss 
 1. Creating a WCF service
 2. Hosting the WCF service using a console application
 3. Exposing 2 service endpoints. 
 4. Creating a windows and a web Client applications.
+ 
+--
  
 ## Let's take the scenario that we discussed in [Part 2](http://csharp-video-tutorials.blogspot.com/2013/11/part-2-creating-remoting-service-and_17.html)
 We have 2 clients and we need to implement a service a for them. 
@@ -29,7 +33,9 @@ In **[Part 2](http://csharp-video-tutorials.blogspot.com/2013/11/part-2-creating
 To meet the requirement of the first client, we implemented a **web service**and to meet the requirement of the second client we implemented a **remoting service**.
 
 In this video, we will create a single **WCF service**, and **configure 2 endpoints** to meet the requirements of both the clients.
-
+ 
+--
+ 
 ### Creating the WCF Service:
 
 1. Create a new Class Library Project and name it **HelloService**.
@@ -39,7 +45,9 @@ should automatically generate 2 files (**HelloService.cs** &
 **IHelloService.cs**). Also a reference to
 **System.ServiceModel** assembly is added.
 4. Copy and paste the following code in **IHelloService.cs** file
-
+ 
+--
+ 
 ```C#
  using System.ServiceModel;
  namespace HelloService
