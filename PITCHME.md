@@ -40,7 +40,7 @@ The Grid is probably the most complex of the panel types. A Grid can contain mul
 
 ## UniformGrid
 
-The UniformGrid is just like the Grid, with the possibility of multiple rows and columns, but with one important difference: All rows and columns will have the same size! Use this when you need the Grid behavior without the need to specify different sizes for the rows and columns.[![<](/images/icons/bullet_arrow_left.png "Previous chapter")Previous](/control-concepts/text-rendering/)[Next![>](/images/icons/bullet_arrow_right.png "Next chapter")](/panels/canvas/)
+The UniformGrid is just like the Grid, with the possibility of multiple rows and columns, but with one important difference: All rows and columns will have the same size! Use this when you need the Grid behavior without the need to specify different sizes for the rows and columns.
 
 ---
 
@@ -99,6 +99,8 @@ These properties allow you to specify the position relative to the four edges of
 ![A simple Canvas, where we position the child elements](http://www.wpf-tutorial.com/chapters/panels/images/canvas_with_positions.png "A simple Canvas, where we position the child elements")
 
 Notice how I only set the property or properties that I need. For the first two buttons, I only wish to specify a value for the X axis, so I use the Left and Right properties to push the buttons towards the center, from each direction.
+
++++
 
 For the bottom buttons, I use both Left/Right and Bottom to push them towards the center in both directions. You will usually specify either a Top or a Bottom value and/or a Left or a Right value.
 
@@ -254,6 +256,8 @@ Notice how button 5 only uses the width - it doesn't care about the height, alth
 
 The **StackPanel** is very similar to the WrapPanel, but with at least one important difference: The StackPanel doesn't wrap the content. Instead it stretches it content in one direction, allowing you to stack item after item on top of each other. Let's first try a very simple example, much like we did with the WrapPanel:
 
++++
+
 ```XML
 <Window x:Class="WpfTutorialSamples.Panels.StackPanel"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -278,6 +282,8 @@ The **StackPanel** is very similar to the WrapPanel, but with at least one impor
 
 The first thing you should notice is how the StackPanel doesn't really care whether or not there's enough room for the content. It doesn't wrap the content in any way and it doesn't automatically provide you with the ability to scroll (you can use a ScrollViewer control for that though - more on that in a later chapter).
 
++++
+
 You might also notice that the default orientation of the StackPanel is Vertical, unlike the WrapPanel where the default orientation is Horizontal. But just like for the WrapPanel, this can easily be changed, using the Orientation property:
 
 ```XML
@@ -290,9 +296,11 @@ You might also notice that the default orientation of the StackPanel is Vertical
 
 +++
 
-Another thing you will likely notice is that the StackPanel stretches its child control by default. On a vertically aligned StackPanel, like the one in the first example, all child controls get stretched horizontally. On a horizontally aligned StackPanel, all child controls get stretched vertically, as seen above. The StackPanel does this by setting the HorizontalAlignment or VerticalAlignment property on its child controls to Stretch, but you can easily override this if you want to. Have a look at the next example, where we use the same markup as we did in the previous example, but this time we assign values to the VerticalAlignment property for all the child controls:
+Another thing you will likely notice is that the StackPanel stretches its child control by default. On a vertically aligned StackPanel, like the one in the first example, all child controls get stretched horizontally. On a horizontally aligned StackPanel, all child controls get stretched vertically, as seen above. The StackPanel does this by setting the HorizontalAlignment or VerticalAlignment property on its child controls to Stretch, but you can easily override this if you want to. 
 
 +++
+
+Have a look at the next example, where we use the same markup as we did in the previous example, but this time we assign values to the VerticalAlignment property for all the child controls:
 
 ```XML
 <Window x:Class="WpfTutorialSamples.Panels.StackPanel"
@@ -562,7 +570,11 @@ In the last chapter, we introduced you to the great Grid panel and showed you a 
 
 ![A Grid with several columns and rows, creating a tabular layout](http://www.wpf-tutorial.com/chapters/panels/images/grid_tabular.png "A Grid with several columns and rows, creating a tabular layout")
 
-A total of nine buttons, each placed in their own cell in a grid containing three rows and three columns. We once again use a star based width, but this time we assign a number as well - the first row and the first column has a width of 2*, which basically means that it uses twice the amount of space as the rows and columns with a width of 1* (or just * - that's the same).
+A total of nine buttons, each placed in their own cell in a grid containing three rows and three columns. 
+
++++
+
+We once again use a star based width, but this time we assign a number as well - the first row and the first column has a width of 2*, which basically means that it uses twice the amount of space as the rows and columns with a width of 1* (or just * - that's the same).
 
 +++
 
@@ -741,6 +753,8 @@ The GridSplitter is used simply by adding it to a column or a row in a Grid, wit
 +++
 
 ![A Grid panel with a GridSplitter control in action](http://www.wpf-tutorial.com/chapters/panels/images/grid_splitter_vertical_not_centered.png "A Grid panel with a GridSplitter control in action")
+
++++
 
 As you can see, I've simply created a Grid with two equally wide columns, with a 5 pixel column in the middle. Each of the sides are just a TextBlock control to illustrate the point. As you can see from the screenshots, the GridSplitter is rendered as a dividing line between the two columns and as soon as the mouse is over it, the cursor is changed to reflect that it can be resized.
 
