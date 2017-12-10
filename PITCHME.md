@@ -1,6 +1,10 @@
 # Introduction to the ListView control
 
-The ListView control is very commonly used in Windows applications, to represent lists of data. A great example of this is the file lists in Windows Explorer, where each file can be shown by its name and, if desired, with columns containing information about the size, last modification date and so on.
+The ListView control is very commonly used in Windows applications, to represent lists of data.
+
++++
+
+A great example of this is the file lists in Windows Explorer, where each file can be shown by its name and, if desired, with columns containing information about the size, last modification date and so on.
 
 +++
 
@@ -103,7 +107,11 @@ As you can see, building a ListView manually in XAML is very simple, but in most
 
 # ListView, data binding and ItemTemplate
 
-In the previous article, we manually populated a ListView control through XAML code, but in WPF, it's all about data binding. The concept of data binding is explained in detail in another part of this tutorial, but generally speaking it's about separating data from layout. So, let's try binding some data to a ListView:
+In the previous article, we manually populated a ListView control through XAML code, but in WPF, it's all about data binding. 
+
++++
+
+The concept of data binding is explained in detail in another part of this tutorial, but generally speaking it's about separating data from layout. So, let's try binding some data to a ListView:
 
 +++
 
@@ -395,13 +403,15 @@ _Please notice: The Code-behind code for this example is the same as the one use
 
 We specify a custom **CellTemplate** for the last column, where we would like to do some special formatting for the e-mail addresses. For the other columns, where we just want basic text output, we stick with the **DisplayMemberBinding**, simply because it requires way less markup.
 
-+++
+---
 
 # How-to: ListView with left aligned column names
 
-In a normal ListView, the column names are left aligned, but for some reason, Microsoft decided to center the names by default in the WPF ListView. In many cases this will make your application look out-of-style compared to other Windows applications. This is how the ListView will look in WPF by **default**:
+In a normal ListView, the column names are left aligned, but for some reason, Microsoft decided to center the names by default in the WPF ListView. In many cases this will make your application look out-of-style compared to other Windows applications. 
 
 +++
+
+This is how the ListView will look in WPF by **default**:
 
 ![A ListView using a GridView for layout, with the default centered column names](http://www.wpf-tutorial.com/chapters/listview/images/listview_gridview_simple.png "A ListView using a GridView for layout, with the default centered column names")
 
@@ -491,7 +501,7 @@ In case you want another alignment, e.g. right alignment, you just change the va
 <Setter Property="HorizontalContentAlignment" Value="Right" />
 ```
 
---
+---
 
 # ListView grouping
 
@@ -594,9 +604,9 @@ After assigning an ItemsSource, we use this to get a CollectionView that the Lis
 
 The above example was great for showing the basics of ListView grouping, but the look was a tad boring, so let's exploit the fact that WPF lets us define our own templates and spice things up. A common request is to be able to collapse and expand the group, and while WPF doesn't provide this behavior by default, it's somewhat easy to implement yourself. We'll do it by completely re-templating the group container.
 
-It might look a bit cumbersome, but the principles used are somewhat simple and you will see them in other situations when you customize the WPF controls. Here's the code:
-
 +++
+
+It might look a bit cumbersome, but the principles used are somewhat simple and you will see them in other situations when you customize the WPF controls.
 
 ```XML
 <Window x:Class="WpfTutorialSamples.ListView_control.ListViewCollapseExpandGroupSample"
@@ -650,6 +660,8 @@ It might look a bit cumbersome, but the principles used are somewhat simple and 
 +++
 
 Now our groups look a bit more exciting, and they even include an expander button, that will toggle the visibility of the group items when you click it (that's why the single female user is not visible on the screenshot - I collapsed that particular group). By using the ItemCount property that the group exposes, we can even show how many items each group currently consists of.
+
++++
 
 As you can see, it requires a bit more markup than we're used to, but this example also goes a bit beyond what we usually do, so that seems fair. When you read through the code, you will quickly realize that many of the lines are just common elements like style and template.
 
@@ -733,6 +745,8 @@ The XAML looks just like a previous example, where we simply have a couple of co
 
 In the Code-behind, we once again create a list of User objects, which we then assign as the ItemsSource of the ListView. Once we've done that, we use the ItemsSource property to get the CollectionView instance that the ListView automatically creates for us and which we can use to manipulate how the ListView shows our objects.
 
++++
+
 With the view object in our hand, we add a new SortDescription to it, specifying that we want our list sorted by the Age property, in ascending order. As you can see from the screenshot, this works perfectly well - the list is sorted by age, instead of being in the same order as the items were added.
 
 +++
@@ -765,7 +779,11 @@ It's very easy to sort the contents of a ListView, as seen in the above examples
 
 # How-to: ListView with column sorting
 
-In the last chapter we saw how we could easily sort a ListView from Code-behind, and while this will suffice for some cases, it doesn't allow the end-user to decide on the sorting. Besides that, there was no indication on which column the ListView was sorted by. In Windows, and in many user interfaces in general, it's common to illustrate sort directions in a list by drawing a triangle next to the column name currently used to sort by.
+In the last chapter we saw how we could easily sort a ListView from Code-behind, and while this will suffice for some cases, it doesn't allow the end-user to decide on the sorting. Besides that, there was no indication on which column the ListView was sorted by. 
+
++++
+
+In Windows, and in many user interfaces in general, it's common to illustrate sort directions in a list by drawing a triangle next to the column name currently used to sort by.
 
 +++
 
@@ -834,7 +852,7 @@ In Code-behind, there are quite a few things happening. I use a total of three c
 
 +++
 
-```XML
+```C#
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
