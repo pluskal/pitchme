@@ -80,7 +80,7 @@ The last and empty row will let you add to the data source, simply by filling ou
 
 As you can see, it's extremely easy to get started with the DataGrid, but it's also a highly customizable control. In the next chapters, we'll look into all the cool stuff you can do with the DataGrid, so read on.
 
-+++
+---
 
 # DataGrid columns
 
@@ -192,7 +192,7 @@ For the Name property, I've used a simple text based column, so the most interes
 
 By turning off automatically generated columns using the AutoGenerateColumns property, you get full control of which columns are shown and how their data should be viewed and edited. As seen by the example of this article, this opens up for some pretty interesting possibilities, where you can completely customize the editor and thereby enhance the end-user experience.
 
-+++
+---
 
 # DataGrid with row details
 
