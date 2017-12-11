@@ -2,11 +2,17 @@
 
 The DataGrid control looks a lot like the ListView, when using a GridView, but it offers a lot of additional functionality. For instance, the DataGrid can automatically generate columns, depending on the data you feed it with. The DataGrid is also editable by default, allowing the end-user to change the values of the underlying data source.
 
++++
+
 The most common usage for the DataGrid is in combination with a database, but like most WPF controls, it works just as well with an in-memory source, like a list of objects. Since it's a lot easier to demonstrate, we'll mostly be using the latter approach in this tutorial.
+
++++
 
 ## A simple DataGrid
 
 You can start using the DataGrid without setting any properties, because it supports so much out of the box. In this first example, we'll do just that, and then assign a list of our own User objects as the items source:
+
++++
 
 ```XML
 <Window x:Class="WpfTutorialSamples.DataGrid_control.SimpleDataGridSample"
@@ -18,6 +24,8 @@ You can start using the DataGrid without setting any properties, because it supp
         </Grid>
 </Window>
 ```
+
++++
 
 ```C#
 using System;
@@ -52,27 +60,45 @@ namespace WpfTutorialSamples.DataGrid_control
 }
 ```
 
++++
+
 ![A simple DataGrid control](http://www.wpf-tutorial.com/chapters/datagrid/images/datagrid_simple.png "A simple DataGrid control")
 
++++
+
 That's really all you need to start using the DataGrid. The source could just as easily have been a database table/view or even an XML file - the DataGrid is not picky about where it gets its data from.
+
++++
 
 If you click inside one of the cells, you can see that you're allowed to edit each of the properties by default. As a nice little bonus, you can try clicking one of the column headers - you will see that the DataGrid supports sorting right out of the box!
 
 The last and empty row will let you add to the data source, simply by filling out the cells.
 
++++
+
 ## Summary
 
 As you can see, it's extremely easy to get started with the DataGrid, but it's also a highly customizable control. In the next chapters, we'll look into all the cool stuff you can do with the DataGrid, so read on.
+
++++
 
 # DataGrid columns
 
 In the previous chapter, we had a look at just how easy you could get a WPF DataGrid up and running. One of the reasons why it was so easy is the fact that the DataGrid will automatically generate appropriate columns for you, based on the data source you use.
 
++++
+
 However, in some situations you might want to manually define the columns shown, either because you don’t want all the properties/columns of the data source, or because you want to be in control of which inline editors are used.
+
++++
 
 ## Manually defined columns
 
-Let's try an example that looks a lot like the one in the previous chapter, but where we define all the columns manually, for maximum control. You can select the column type based on the data that you wish to display/edit. As of writing, the following column types are available:
+Let's try an example that looks a lot like the one in the previous chapter, but where we define all the columns manually, for maximum control. You can select the column type based on the data that you wish to display/edit. 
+
++++
+
+As of writing, the following column types are available:
 
 *   DataGridTextColumn
 *   DataGridCheckBoxColumn
@@ -80,7 +106,13 @@ Let's try an example that looks a lot like the one in the previous chapter, but 
 *   DataGridHyperlinkColumn
 *   DataGridTemplateColumn
 
+
++++
+
+
 Especially the last one, the DataGridTemplateColumn, is interesting. It allows you to define any kind of content, which opens up the opportunity to use custom controls, either from the WPF library or even your own or 3rd party controls. Here's an example:
+
++++
 
 ```XML
 <Window x:Class="WpfTutorialSamples.DataGrid_control.DataGridColumnsSample"
@@ -106,6 +138,8 @@ Especially the last one, the DataGridTemplateColumn, is interesting. It allows y
         </Grid>
 </Window>
 ```
+
++++
 
 ```C#
 using System;
@@ -140,17 +174,31 @@ namespace WpfTutorialSamples.DataGrid_control
 }
 ```
 
++++
+
 ![A DataGrid with custom columns](http://www.wpf-tutorial.com/chapters/datagrid/images/datagrid_columns.png "A DataGrid with custom columns")
 
-In the markup, I have added the AutoGenerateColumns property on the DataGrid, which I have set to false, to get control of the columns used. As you can see, I have left out the ID column, as I decided that I didn't care for it for this example. For the Name property, I've used a simple text based column, so the most interesting part of this example comes with the Birthday column, where I've used a DataGridTemplateColumn with a DatePicker control inside of it. This allows the end-user to pick the date from a calendar, instead of having to manually enter it, as you can see on the screenshot.
++++
+
+In the markup, I have added the AutoGenerateColumns property on the DataGrid, which I have set to false, to get control of the columns used. As you can see, I have left out the ID column, as I decided that I didn't care for it for this example. 
+
++++
+
+For the Name property, I've used a simple text based column, so the most interesting part of this example comes with the Birthday column, where I've used a DataGridTemplateColumn with a DatePicker control inside of it. This allows the end-user to pick the date from a calendar, instead of having to manually enter it, as you can see on the screenshot.
+
++++
 
 ## Summary
 
 By turning off automatically generated columns using the AutoGenerateColumns property, you get full control of which columns are shown and how their data should be viewed and edited. As seen by the example of this article, this opens up for some pretty interesting possibilities, where you can completely customize the editor and thereby enhance the end-user experience.
 
++++
+
 # DataGrid with row details
 
 A very common usage scenario when using a DataGrid control is the ability to show details about each row, typically right below the row itself. The WPF DataGrid control supports this very well, and fortunately it's also very easy to use. Let's start off with an example and then we'll discuss how it works and the options it gives you afterwards:
+
++++
 
 ```XML
 <Window x:Class="WpfTutorialSamples.DataGrid_control.DataGridDetailsSample"
@@ -172,6 +220,8 @@ A very common usage scenario when using a DataGrid control is the ability to sho
         </Grid>
 </Window>
 ```
+
++++
 
 ```C#
 using System;
@@ -213,21 +263,35 @@ namespace WpfTutorialSamples.DataGrid_control
 }
 ```
 
++++
+
 ![A DataGrid with a simple details row](http://www.wpf-tutorial.com/chapters/datagrid/images/datagrid_details.png "A DataGrid with a simple details row")
+
++++
 
 As you can see, I have expanded the example from previous chapters with a new property on the User class: The Description property. It simply returns a bit of information about the user in question, for our details row.
 
++++
+
 In the markup, I have defined a couple of columns and then I use the **RowDetailsTemplate** to specify a template for the row details. As you can see, it works much like any other WPF template, where I use a DataTemplate with one or several controls inside of it, along with a standard binding against a property on the data source, in this case the Description property.
 
++++
+
 As you can see from the resulting screenshot, or if you run the sample yourself, the details are now shown below the selected row. As soon as you select another row, the details for that row will be shown and the details for the previously selected row will be hidden.
+
++++
 
 ## Controlling row details visibility
 
 Using the **RowDetailsVisibilityMode** property, you can change the above mentioned behavior though. It defaults to**VisibleWhenSelected**, where details are only visible when its parent row is selected, but you can change it to **Visible** or **Collapsed**. If you set it to Visible, all details rows will be visible all the time, like this:
 
++++
+
 ![A DataGrid with a all details rows visible at the same time](http://www.wpf-tutorial.com/chapters/datagrid/images/datagrid_details_visible.png "A DataGrid with a all details rows visible at the same time")
 
 If you set it to Collapsed, all details will be invisible all the time.
+
++++
 
 ## More details
 
@@ -235,7 +299,11 @@ The first example of this article might have been a tad boring, using just a sin
 
 ![A DataGrid with a more complex details row](http://www.wpf-tutorial.com/chapters/datagrid/images/datagrid_details_more.png "A DataGrid with a more complex details row")
 
-As you can see from the code listing, it's mostly about expanding the details template into using a panel, which in turn can host more panels and/or controls. Using a Grid panel, we can get the tabular look of the user data, and an Image control allows us to show a picture of the user (which you should preferably load from a locale resource and not a remote one, like I do in the example - and sorry for being too lazy to find a matching image of Jane and Sammy Doe).
++++
+
+As you can see from the code listing, it's mostly about expanding the details template into using a panel, which in turn can host more panels and/or controls. Using a Grid panel, we can get the tabular look of the user data, and an Image control allows us to show a picture of the user.
+
++++
 
 ```XML
 <Window x:Class="WpfTutorialSamples.DataGrid_control.DataGridDetailsSample"
@@ -279,6 +347,8 @@ As you can see from the code listing, it's mostly about expanding the details te
 </Window>
 ```
 
++++
+
 ```C#
 using System;
 using System.Collections.Generic;
@@ -313,14 +383,9 @@ namespace WpfTutorialSamples.DataGrid_control
 }
 ```
 
++++
+
 ## Summary
 
 Being able to show details for a DataGrid row is extremely useful, and with the WPF DataGrid it's both easy and highly customizable, as you can see from the examples provided in this tutorial.
 
-[![<](/images/icons/bullet_arrow_left.png "Previous chapter")Previous](/datagrid-control/custom-columns/)[Next![>](/images/icons/bullet_arrow_right.png "Next chapter")](/styles/introduction/)
-
-<div style="text-align: center; margin: 0 0 20px 0;"><script type="text/javascript"><!-- google_ad_client = "ca-pub-1132262176862667"; /* wpf-tutorial.com */ google_ad_slot = "4171774237"; google_ad_width = 336; google_ad_height = 280; if(windowWidth < 450) { google_ad_slot = "2555440235"; google_ad_width = 300; google_ad_height = 250; } //--></script></div>
-
-</article>
-
-</div>
