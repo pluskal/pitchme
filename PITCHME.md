@@ -259,7 +259,11 @@ WPF styling allows you to easily re-use a certain look for your controls all ove
 
 # Trigger, DataTrigger & EventTrigger
 
-So far, we worked with styles by setting a static value for a specific property. However, using triggers, you can change the value of a given property, once a certain condition changes. Triggers come in multiple flavors: Property triggers, event triggers and data triggers. They allow you to do stuff that would normally be done in code-behind completely in markup instead, which is all a part of the ongoing process of separating style and code.
+So far, we worked with styles by setting a static value for a specific property. However, using triggers, you can change the value of a given property, once a certain condition changes. Triggers come in multiple flavors: Property triggers, event triggers and data triggers.
+
++++
+
+They allow you to do stuff that would normally be done in code-behind completely in markup instead, which is all a part of the ongoing process of separating style and code.
 
 +++
 
@@ -506,7 +510,7 @@ In this example, I've re-created the example we used with the regular DataTrigge
 
 As you can see, multi triggers are pretty much just as easy to use as regular triggers and they can be extremely useful, especially when developing your own controls.
 
---
+---
 
 # Trigger animations
 
